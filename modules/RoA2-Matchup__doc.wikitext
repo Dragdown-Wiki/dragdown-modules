@@ -1,0 +1,30 @@
+{{MatchupSummaryBox-RoA2
+|host = Maypul
+|mu = Clairen
+|oneliner =
+|notes = 
+* In this matchup, Clairen's range keeps Maypul out, so it's up to Maypul to find a way to make Clairen approach and whiff punish her options.
+* Tools like {{special|Lily}} start to become a liability in this matchup, due to the threat of {{special|NFZ}}. 
+* Whiff punish her landings, as hard as this sounds.
+}}
+
+{{MatchupSummaryBox-RoA2
+|host = Clairen
+|mu = Clairen
+|oneliner =
+|notes = 
+}}
+
+{{MatchupSummaryBox-RoA2
+|host = Maypul
+|mu = Etalus
+|oneliner = ice
+|notes = 
+}}
+
+{{MatchupSummaryBox-RoA2
+|host = Maypul
+|mu = Olympia
+|oneliner =
+|notes = 
+}}

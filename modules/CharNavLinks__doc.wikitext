@@ -1,0 +1,59 @@
+CharNavLinks is the sum of [[Template:CharNavCard|CharNavCard]] and a character's Data Links, to be displayed at the bottom of each character page and in the header of any character subpages. This allows easy navigation back to the main character page as well as quick access to the other subpages under that character. The image displayed is always the character's main portrait.
+
+<pre>
+{{#invoke:CharNavLinks 
+| main 
+}}
+</pre>
+
+The image offset and color of the card outline are determined by a table within this module. Offsets are designed to display the character's eyes within the frame, while the outline colors are based on the official character grouping colors in their respective game, where possible.
+
+=== Examples ===
+RoA2:
+<pre>
+{{#invoke:CharNavLinks
+|main
+}}
+</pre>
+{{#invoke:CharNavLinks|main|baseTitle=RoA2/Forsburn}}
+
+SSBU:
+<pre>
+{{#invoke:CharNavLinks
+|main
+}}
+</pre>
+{{#invoke:CharNavLinks|main|baseTitle=SSBU/Steve}}
+
+NASB2:
+<pre>
+{{#invoke:CharNavLinks
+|main
+}}
+</pre>
+{{#invoke:CharNavLinks|main|baseTitle=NASB2/SpongeBob}}
+
+PPlus:
+<pre>
+{{#invoke:CharNavLinks
+|main
+}}
+</pre>
+{{#invoke:CharNavLinks|main|baseTitle=PPlus/Pit}}
+
+==== Why do I see offset and color being manually called? ====
+In older versions of this module, offset and color needed to be manually input. This was removed to minimize the amount of additional work needed to make every subpage consistent as the wiki expands. For the navigation links, all offset and color styling is done within this template now.
+
+Including offset and color when calling this module will now have no effect, but including them will not break anything.
+
+Example using custom offsets and colors:
+<pre>
+{{#invoke:CharNavLinks
+|main
+|offset=80
+|color=#0000FF
+}}
+</pre>
+{{#invoke:CharNavLinks|main|baseTitle=RoA2/Forsburn|offset=45|color=#0099FF}}
+
+In theory, this should produce a blue outline and have the offset display lower on Forsburn's portrait, but you can see this is not the case. This is intended behavior. Customizing the offset, color, and more is still supported in [[Template:CharNavCard|CharNavCard]].

@@ -1,0 +1,2 @@
+- on linux: `apt install lua5.1`
+- on linux, to use `watch.sh`: `apt install inotify-tools`

@@ -1,0 +1,6 @@
+{| role="presentation" class="sortable"
+|+ Babydash
+|-
+! Character !! Babydash Frames !! Babydash Length (cm)
+{{#invoke:RoA2 Babydash Lengths|main}}
+|}

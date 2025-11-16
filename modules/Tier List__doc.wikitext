@@ -1,0 +1,32 @@
+<div style="text-align: center; width: 100%; font-size: 24px;"><u>Tier List Generator written by '''Tarkus Lee''' from Dustloop</u></div>
+
+<code>Module:Tier_List</code> is used to generate tier lists directly within the wiki using HTML, and the existing character labels.
+==Usage==
+A tier list requires that arguments be present in order.
+# All of the tiers, ordered from top to bottom
+
+Within a given tier, you must define the label for that tier (the letter that appears inside of the colored square) followed by a semicolon character (';').
+
+===Short Names in Labels===
+The tier list will attempt to find the appropriate icon and link for a given character. If you choose not to use the full name of a character, you must set up a necessary redirect from the short name to the full name. This applies to both the icon file and the character page itself.
+
+==Exampel==
+<pre>
+{{#invoke:Tier List|drawTierList
+|Top 10;Pikachu,Joker,Pyra,Roy,Peach,Pac-Man,Mii Brawler,Palutena,Fox,Steve
+|Top;Wolf,Mr. Game & Watch,R.O.B.,Mario,Sonic,Snake,Wario,Shulk,Pokemon Trainer,Samus,Sora,Zero Suit Samus,Young Link,Olimar,Lucina,Sheik,Cloud
+|High;Yoshi,Min Min,Captain Falcon,Terry,Ness,Ryu,Diddy Kong,Kazuya,Greninja,Byleth,Link,Chrom,Mega Man,Corrin,Luigi,Inkling,Hero,Sephiroth,Falco,Ken,Bowser,Incineroar
+|Mid;Lucas,Mewtwo,Wii Fit Trainer,Jigglypuff,Pichu,Duck Hunt,Bayonetta,Toon Link,Mii Gunner,Pit,Rosalina & Luma,Ike,Robin,Ridley,Villager,Richter,King K. Rool
+|Low;Zelda,Marth,Bowser Jr.,Isabelle,Kirby,Ice Climbers,Mii Swordfighter,Donkey Kong,Meta Knight,King Dedede,Banjo & Kazooie
+|Bottom;Lucario,Dr. Mario,Piranha Plant,Little Mac,Ganondorf
+}}
+</pre>
+{{#invoke:Tier List|drawTierList
+|SSBU
+|Top 10;Pikachu,Joker,Pyra,Roy,Peach,Pac-Man,Mii Brawler,Palutena,Fox,Steve
+|Top;Wolf,Mr. Game & Watch,R.O.B.,Mario,Sonic,Snake,Wario,Shulk,Pokemon Trainer,Samus,Sora,Zero Suit Samus,Young Link,Olimar,Lucina,Sheik,Cloud
+|High;Yoshi,Min Min,Captain Falcon,Terry,Ness,Ryu,Diddy Kong,Kazuya,Greninja,Byleth,Link,Chrom,Mega Man,Corrin,Luigi,Inkling,Hero,Sephiroth,Falco,Ken,Bowser,Incineroar
+|Mid;Lucas,Mewtwo,Wii Fit Trainer,Jigglypuff,Pichu,Duck Hunt,Bayonetta,Toon Link,Mii Gunner,Pit,Rosalina & Luma,Ike,Robin,Ridley,Villager,Richter,King K. Rool
+|Low;Zelda,Marth,Bowser Jr.,Isabelle,Kirby,Ice Climbers,Mii Swordfighter,Donkey Kong,Meta Knight,King Dedede,Banjo & Kazooie
+|Bottom;Lucario,Dr. Mario,Piranha Plant,Little Mac,Ganondorf
+}}

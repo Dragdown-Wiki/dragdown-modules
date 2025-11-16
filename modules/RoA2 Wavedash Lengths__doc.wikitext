@@ -1,0 +1,6 @@
+{| role="presentation" class="sortable"
+|+ Wavedashes
+|-
+! Character !! Wavedash Length !! Post-Wavedash Speed
+{{#invoke:RoA2 Wavedash Lengths|main}}
+|}

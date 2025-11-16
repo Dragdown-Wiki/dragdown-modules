@@ -1,0 +1,24 @@
+The Pikmin Module/Template is for discussing any instance of {{StockIcon|game=PPlus|Olimar}} / {{StockIcon|game=SSBU|Olimar}}, or any situation where specific interactions with Pikmin are relevant. 
+
+'''The only input to this template is the color of the Pikmin desired.'''
+<pre>{{Pikmin|Red}}</pre>
+
+Below are the supported Pikmin types:
+* {{Pikmin|Red}}
+* {{Pikmin|Blue}}
+* {{Pikmin|Yellow}}
+* {{Pikmin|Purple}}
+* {{Pikmin|White}}
+* {{Pikmin|Winged}}
+* {{Pikmin|Captain}}
+
+The {{Pikmin|Captain}} input is intended to represent situations that depend on the Pikmin captain or situations where the captain has no Pikmin in their queue.
+
+Additionally, a few alternate inputs are supported, aside from the above proper names:
+* {{Pikmin|Pink}}
+* {{Pikmin|Olimar}}
+* {{Pikmin|Alph}}
+* {{Pikmin|None}}
+* {{Pikmin|No}}
+* {{Pikmin|N/A}}
+* {{Pikmin|NA}}

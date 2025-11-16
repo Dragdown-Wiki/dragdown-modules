@@ -1,0 +1,13 @@
+{| role="presentation" class="sortable"
+|+ Weight
+|-
+! Character !! Weight
+{{#invoke:PPlus CharStatTable|main|Weight}}
+|}
+
+{| role="presentation" class="sortable"
+|+ Full Hop Speeds
+|-
+! Character !! Horizontal !! Vertical
+{{#invoke:PPlus CharStatTable|main|JumpHInitialVelocity|JumpVInitialVelocity}}
+|}

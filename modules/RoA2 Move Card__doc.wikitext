@@ -1,0 +1,8 @@
+{{#invoke:RoA2 Move Card|main
+|chara=Clairen
+|attack=Nspecial
+}}
+{{#invoke:RoA2 Move Card|main
+|chara=Clairen
+|attack=Bair
+}}

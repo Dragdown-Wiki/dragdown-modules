@@ -1,0 +1,3 @@
+{{#invoke:NASB2 Move Card|main|chara=Spongebob|attack=Utilt|desc=Basic description.|advDesc=Advanced description.}}
+
+{{#invoke:NASB2 Move Card|main|chara=Spongebob|attack=Dtilt|desc=Basic description.|advDesc=Advanced description.}}

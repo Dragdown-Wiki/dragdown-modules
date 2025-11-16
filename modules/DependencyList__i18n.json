@@ -1,0 +1,111 @@
+{
+	"license": "CC0-1.0",
+	"description": {
+		"en": "Translation table for the Module:DependencyList"
+	},
+	"schema": {
+		"fields": [
+			{
+				"name": "id",
+				"type": "string"
+			},
+			{
+				"name": "message",
+				"type": "localized"
+			}
+		]
+	},
+	"data": [
+		[
+			"message_unused_module_title",
+			{
+				"de": "Dieses Modul wird nicht verwendet.",
+				"en": "This module is unused."
+			}
+		],
+		[
+			"message_unused_module_desc",
+			{
+				"de": "Dieses Modul wird weder von einer Vorlage aufgerufen noch von einem anderen Modul benötigt/geladen. Wenn dies ein Fehler ist, stelle bitte sicher, dass \u003Ccode\u003E{{[[Vorlage:Dokumentation|Dokumentation]]}}\u003C/code\u003E/\u003Ccode\u003E{{[[Vorlage:Keine Dokumentation|Keine\u0026nbsp;Dokumentation]]}}\u003C/code\u003E auf der Dokumentationsseite der Vorlage oder des Moduls eingebunden ist.",
+				"en": "This module is neither invoked by a template nor required/loaded by another module. If this is in error, make sure to add \u003Ccode\u003E{{[[Template:Documentation|Documentation]]}}\u003C/code\u003E/\u003Ccode\u003E{{[[Template:No documentation|No\u0026nbsp;documentation]]}}\u003C/code\u003E to the calling template's or parent's module documentation."
+			}
+		],
+		[
+			"message_not_exists",
+			{
+				"de": "$1 existiert nicht.",
+				"en": "$1 does not exist."
+			}
+		],
+		[
+			"message_invokes_function",
+			{
+				"de": "'''$1''' verwendet die Funktion '''$2''' in [[$3]] durch [[Star Citizen:Lua|Lua]].",
+				"en": "'''$1''' invokes function '''$2''' in [[$3]] using [[Star Citizen:Lua|Lua]]."
+			}
+		],
+		[
+			"message_module_functions_invoked_by",
+			{
+				"de": "'''$1''''s functions wird aufgerufen von $2.",
+				"en": "'''$1''''s functions are invoked by $2."
+			}
+		],
+		[
+			"message_function_invoked_by",
+			{
+				"de": "$2 (function '''$1''')",
+				"en": "$2 (function '''$1''')"
+			}
+		],
+		[
+			"message_required_by",
+			{
+				"de": "'''$1''' wird benötigt von $2.",
+				"en": "'''$1''' is required by $2."
+			}
+		],
+		[
+			"message_loaded_by",
+			{
+				"de": "'''$1''' geladen von $2.",
+				"en": "'''$1''' loaded by $2."
+			}
+		],
+		[
+			"message_loads_data_from",
+			{
+				"de": "'''$1''' lädt Daten von $2.",
+				"en": "'''$1''' loads data from $2."
+			}
+		],
+		[
+			"message_transcludes",
+			{
+				"de": "'''$1''' bindet $2 ein, durch \u003Csamp\u003Eframe:preprocess()\u003C/samp\u003E.",
+				"en": "'''$1''' transcludes $2 using \u003Csamp\u003Eframe:preprocess()\u003C/samp\u003E."
+			}
+		],
+		[
+			"message_requires",
+			{
+				"de": "'''$1''' benötigt $2.",
+				"en": "'''$1''' requires $2."
+			}
+		],
+		[
+			"list_type_modules",
+			{
+				"de": "Module",
+				"en": "modules"
+			}
+		],
+		[
+			"list_type_templates",
+			{
+				"de": "Vorlagen",
+				"en": "templates"
+			}
+		]
+	]
+}

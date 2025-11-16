@@ -1,0 +1,3 @@
+{{#invoke:RoA2-CharSubBox|main|chara=Maypul}}
+{{#invoke:RoA2-CharSubBox|main|chara=Clairen}}
+{{#invoke:RoA2-CharSubBox|main|chara=Etalus}}

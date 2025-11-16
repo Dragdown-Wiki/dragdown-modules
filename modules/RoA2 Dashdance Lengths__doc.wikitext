@@ -1,0 +1,6 @@
+{| role="presentation" class="sortable"
+|+ Dashdances
+|-
+! Character !! Dashdance Length (cm) !! Average Speed mid-Dash (cm/f)
+{{#invoke:RoA2 Dashdance Lengths|main}}
+|}

@@ -1,0 +1,97 @@
+.frameChart {
+	display: flex;
+	border-bottom: 1px solid;
+	border-color: var(--border-color-base);
+	gap: var(--space-xs);
+	justify-content: flex-start;
+    padding: var(--space-xs);
+}
+
+.frameChart-data {
+	display: flex;
+	gap: 2px;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.frame-data {
+	width: 10px;
+	height: 10px;
+}
+
+.frame-data-startup {
+	background-color: #36B37E;
+}
+.frame-data-startup-alt {
+	background-color: #103525;
+}
+
+.frame-data-active {
+	background-color: #FF5D5D;
+}
+
+.frame-data-active-alt {
+	background-color: #7f2e2e;
+}
+
+.frame-data-inactive {
+	background-color: gray;
+}
+
+.frame-data-endlag {
+	background-color: #0069B6;
+}
+
+.frame-data-endlag-alt {
+	background-color: #003d6a;
+}
+
+.frame-data-landingLag {
+	background-color: #db69cf;
+}
+
+.frame-data-frc {
+	border-bottom: 4px solid #e9d704;
+}
+
+.spawn-projectile {
+	width: 3px;
+	height: 14px;
+	margin-left: -2px;
+	background-color: red;
+}
+
+.frame-chart-row {
+	/*display: grid;*/
+	grid-template-columns: 24px 1fr;
+	grid-auto-rows: 1fr;
+	align-items: center;
+	margin: 0.25em 0;
+	border-bottom: 1px solid var(--border-color-base);
+}
+
+.frame-data-total {
+	font-size: 0.8125rem;
+	display: flex;
+	gap: var(--space-xs);
+}
+
+.frameChart-title {
+	font-size: 0.8125rem;
+	display: flex;
+	gap: var(--space-xs);
+	color: var(--color-base--subtle);
+    font-weight: var(--font-weight-normal);
+    letter-spacing: 0.05em;
+}
+
+.frame-data-total-label {
+	color: var(--color-base--subtle);
+    font-weight: var(--font-weight-normal);
+    letter-spacing: 0.05em;
+}
+
+.frame-data-total-value {
+    color: var(--color-base--emphasized);
+    font-weight: var(--font-weight-medium);
+}

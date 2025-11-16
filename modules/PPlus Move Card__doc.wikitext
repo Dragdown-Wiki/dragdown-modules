@@ -1,0 +1,13 @@
+{{PPlus Move Card
+|attack = Ftilt
+|description  = A forward-moving punch that looks a lot like {{tilt|Jab 2}}. {{tilt|Forward Tilt}} can’t reverse hit, which makes it decent combo filler. It can be cancelled into from {{tilt|Dash Attack}}, but it’s not an essential part of Lucario’s toolkit.
+
+}}
+
+{{#invoke:PPlus Move Card|main|chara=Captain Falcon|attack=Utilt}}
+
+{{#invoke:PPlus Move Card|main|chara=Toon Link|attack=Jab}}
+
+{{#invoke:PPlus Move Card|main|chara=Captain Falcon|attack=Nair}}
+
+{{#invoke:PPlus Move Card|main|chara=Captain Falcon|attack=Jab}}

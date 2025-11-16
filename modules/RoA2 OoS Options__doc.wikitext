@@ -1,0 +1,1 @@
+{{#invoke:RoA2 OoS Options|main|chara=Clairen|aerials=Nair;Dair;Uair|groundeds=Ustrong}}

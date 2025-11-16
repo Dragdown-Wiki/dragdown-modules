@@ -1,0 +1,37 @@
+<pre><nowiki>
+The following flags can be used in this flag to give the following notices, with the additional clarifier argument to specify any clarifications:
+
+default = This section has been marked for the following reason.
+cleanup = This section/page has been marked for cleanup or revision, possibly due to the following reasons: spelling mistakes, presentation improvements, formatting improvements, wordiness, or any reason that makes it not as accessible to a new reader.
+stub = This page is either still being worked on or is vastly incomplete. You can help by editing it.
+delete = This section/page has been flagged for deletion. If you believe this is a mistake, contact the administration on Discord.
+research = The following aspects require further research or verification.
+verified = This page has been verified since {{{REVISIONID|}}}.
+
+new_patch = This section was recently changed in the most recent patch. To see the full list of changes, check [[RoA2/Patch Notes]].
+research = The following aspects require further research or verification.
+charproj = This page is planned to undergo a major revision via the wiki's RoA2 [[Dragdown:Roadmap/RoA2#Character_Project|character project]]. Until then, consider this page incomplete.
+
+=====CHARACTER FLAGS======
+
+newchar = This character is either unreleased or has been recently released. Missing information will be added as soon as possible.
+factcheck = This page/section is in need of fact-checking. Before removing this flag, make sure you verify this content with at least one other person, and make note of it in your edit summary. ''(E.G.: \"verified with Ilikepizza107 and Motobug\")''
+unassigned_char = This character has yet to be assigned an certified consultant on the character. If you are an expert on the character and want to be assigned, please mention an admin on the server to get approval.
+assigned_char = This character is currently assigned to {{{user|}}}.
+revision_char = This character page has been completed and is awaiting revision and approval.
+approved_char = The character page is in good standing. It has been approved by {{{user|}}} since {{{REVISIONID|}}}.
+verified = This page has been verified since {{{REVISIONID|}}}.
+</nowiki>
+</pre>
+
+* [[:Category:Verification Needed]]
+* [[:Category:Articles_in_need_of_cleanup]]
+* [[:Category:Stubs]]
+* [[:Category:Candidates for deletion]]
+* [[:Category:Outdated Pages]]
+* [[:Category:Research Needed]]
+* [[:Category:RoA2_Character_Project]]
+* [[:Category:New_Characters]]
+* [[:Category:Pages_in_need_of_fact_checking]]
+* [[:Category:Pages_in_need_of_revision]]
+* [[:Category:Verified]]

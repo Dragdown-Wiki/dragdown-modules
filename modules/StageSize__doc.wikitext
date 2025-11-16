@@ -1,0 +1,55 @@
+StageSize is used to provide an inline representation of any stage measurement, whether that be overall stage size, blastzone distance, stage length, or otherwise. There are currently 6 possible levels of size that can be represented:
+* {{#invoke:StageSize | main | XS}} 
+* {{#invoke:StageSize | main | S}} 
+* {{#invoke:StageSize | main | M}} 
+* {{#invoke:StageSize | main | L}} 
+* {{#invoke:StageSize | main | XL}}
+* {{#invoke:StageSize | main | NA}} (Used for situations where the measurement doesn't apply, such as in the case of walkoff blastzones)
+
+This template takes in two possible parameters:
+<pre>
+{{ StageSize
+| first parameter: the size to be used. Can be XS, S, M, L, XL, or NA.
+| (optional) second parameter: the text to be styled 
+}}
+</pre>
+
+For example:
+<pre>
+{{ StageSize
+| XL
+| I can put any text in here!
+}}
+</pre>
+{{ StageSize
+| XL
+| I can put any text in here!
+}}
+
+The second parameter is completely optional. If no text is given in that slot, then the word equivalent of that size will be printed out. For example:
+<pre>
+{{ StageSize
+| XS
+}}
+</pre>
+{{ StageSize
+| XS
+}}
+
+The [[Module:StageSize|Module StageSize]] is wrapped in the [[Template:StageSize|Template StageSize]] to make editing more accessible. Actual edits to the contents of this widget should be done to the Module itself.
+
+== Further examples of behavior ==
+
+=== Size-Specified (yes arg1, no arg2) ===
+<pre>
+{{#invoke:StageSize | main | XS}} {{#invoke:StageSize | main | S}} {{#invoke:StageSize | main | M}} {{#invoke:StageSize | main | L}} {{#invoke:StageSize | main | XL}} {{#invoke:StageSize | main | NA}} 
+</pre>
+
+{{#invoke:StageSize | main | XS}} {{#invoke:StageSize | main | S}} {{#invoke:StageSize | main | M}} {{#invoke:StageSize | main | L}} {{#invoke:StageSize | main | XL}} {{#invoke:StageSize | main | NA}} 
+
+=== Caption-Specified (yes arg1, yes arg2) ===
+<pre>
+{{#invoke:StageSize | main | XS | 10}} {{#invoke:StageSize | main | S | 25}} {{#invoke:StageSize | main | M | 50}} {{#invoke:StageSize | main | L | 100}} {{#invoke:StageSize | main | XL | 500}} {{#invoke:StageSize | main | NA | Walkoff}} 
+</pre>
+
+{{#invoke:StageSize | main | XS | 10}} {{#invoke:StageSize | main | S | 25}} {{#invoke:StageSize | main | M | 50}} {{#invoke:StageSize | main | L | 100}} {{#invoke:StageSize | main | XL | 500}} {{#invoke:StageSize | main | NA | Walkoff}}

@@ -1,0 +1,1 @@
+{{#invoke:PPlus-CharSubBox|main|chara=Zero Suit Samus}}

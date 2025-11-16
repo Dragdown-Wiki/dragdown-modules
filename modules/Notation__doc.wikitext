@@ -1,0 +1,165 @@
+
+= NOTE: This template is still a work in progress, and the documentation will change accordingly. =
+== Explanation ==
+This template is a copy-and-paste way of notating inputs in the platform fighters featured in Dragdown, in a way that is controller-agnostic. Hovering over the notation will provide the default controls for the notated input in its respective game.
+== Syntax ==
+<code><nowiki>{{Notation|[move]|[game]|[size]}}</nowiki></code><br>
+== Parameters ==
+<code>[move]</code> - The input; a specific in-game action bound to an analog stick movement, a digital button, or a combination of buttons.
+* With the exception of <code>LS</code> and <code>RS</code>, these will not have the bold underlined text featured next to the glyph, and there are no alternative inline versions. There is one hovertext for all normal direction notation, and one hovertext for all tap notation.
+* Examples: <code>Left</code>, <code>UpTap</code>, <code>RS-Down</code>, <code>Attack</code>, <code>Grab</code>
+
+<code>[game]</code> - Optional. The particular game where the input comes from. This changes the icon used and the hovertext for default controls. Defaults to the game-prefix of the article (e.g. using <code><nowiki>{{Notation}}</nowiki></code> in [[PPlus/Mario]] without specifying the game will fall back on <code>PPlus</code> glyphs). Otherwise defaults to <code>RoA2</code>.
+* <code>SSBU</code>
+* <code>RoA2</code>
+* <code>NASB2</code>
+* <code>PPlus</code>
+
+<code>[size]</code> - Optional. Size of the icon. Leaving this blank will default to a height of 42 pixels, appropriate for notating move cards.
+* <code>inline</code>: '''IMPORTANT!''' Please always use this when using <code><nowiki>{{Notation}}</nowiki></code> within normal-size body text. Utilizes alternative icons, in a forced height of 25 pixels.
+* <code>[?]px</code>: Proportionally resize the icon to a width of <code>[?]</code> pixels
+* <code>x[??]px</code>: Proportionally resize the icon to a height of <code>[??]</code> pixels
+* <code>[?]x[??]px</code>: Resize the icon to be <code>[?]</code> pixels wide by <code>[??]</code> pixels high
+
+== Examples == 
+<code><nowiki>{{Notation|Right|SSBU}} + {{Notation|Special|SSBU}}</nowiki></code> --> {{Notation|Right|SSBU}} + {{Notation|Special|SSBU}}
+
+<code><nowiki>{{Notation|Attack|RoA2}}</nowiki></code> --> {{Notation|Attack|RoA2}}
+
+<code><nowiki>Lorem ipsum dolor sit amet {{Notation|Attack|RoA2|inline}} consectetur adipiscing elit</nowiki></code> --> Lorem ipsum dolor sit amet {{Notation|Attack|RoA2|inline}} consectetur adipiscing elit
+
+<code><nowiki>{{Notation|Grab|SSBU|100px}}</nowiki></code> --> {{Notation|Grab|SSBU|100px}}
+
+<code><nowiki>=== {{clr|smash|DACUS}} ===</nowiki></code> <br>
+<code><nowiki><<big>While Dashing / Running {{Notation|Attack|RoA2}} {{tt|>|Within 4 frames}} {{Notation|Up|RoA2}} + {{Notation|Strong|RoA2}} / {{Notation|Grab|RoA2}}</big><br></nowiki></code> <br>
+vvvvv
+=== {{clr|smash|DACUS}} ===
+<big>While Dashing / Running {{Notation|Attack|RoA2}} {{tt|>|Within 4 frames}} {{Notation|Up|RoA2}} + {{Notation|Strong|RoA2}} / {{Notation|Grab|RoA2}}</big><br>
+
+== Full list of notation prompts ==
+* Directional inputs (only the tooltips change depending on the game):
+** Left Stick Directional input (removing <code>LS-</code> will default to the left stick glyph)
+*** Default:
+**** Tilt: <code>LS-Up</code> {{Notation|LS-Up}} / <code>LS-Down</code> {{Notation|LS-Down}} / <code>LS-Left</code> {{Notation|LS-Left}} / <code>LS-Right</code> {{Notation|LS-Right}} / <code>LS-DownRight</code> {{Notation|LS-DownRight}} / <code>LS-DownLeft</code> {{Notation|LS-DownLeft}} / <code>LS-UpRight</code> {{Notation|LS-UpRight}} / <code>LS-UpLeft</code> {{Notation|LS-UpLeft}} / <code>LS-LeftRight</code> {{Notation|LS-LeftRight}} / <code>LS-Neutral</code> {{Notation|LS-Neutral}}
+**** Tap: <code>LS-UpTap</code> {{Notation|LS-UpTap}} / <code>LS-DownTap</code> {{Notation|LS-DownTap}} / <code>LS-LeftTap</code> {{Notation|LS-LeftTap}} / <code>LS-RightTap</code> {{Notation|LS-RightTap}} / <code>LS-LeftRightTap</code> {{Notation|LS-LeftRightTap}}
+**** Non-directional label: <code>LS</code> {{Notation|LS}}
+*** Inline (same images, just resized):
+**** Normal: <code>LS-Up</code> {{Notation|LS-Up|inline}} / <code>LS-Down</code> {{Notation|LS-Down|inline}} / <code>LS-Left</code> {{Notation|LS-Left|inline}} / <code>LS-Right</code> {{Notation|LS-Right|inline}} / <code>LS-DownRight</code> {{Notation|LS-DownRight|inline}} / <code>LS-DownLeft</code> {{Notation|LS-DownLeft|inline}} / <code>LS-UpRight</code> {{Notation|LS-UpRight|inline}} / <code>LS-UpLeft</code> {{Notation|LS-UpLeft|inline}} / <code>LS-LeftRight</code> {{Notation|LS-LeftRight|inline}} / <code>LS-Neutral</code> {{Notation|LS-Neutral|inline}}
+**** Tap: <code>LS-UpTap</code> {{Notation|LS-UpTap|inline}} / <code>LS-DownTap</code> {{Notation|LS-DownTap|inline}} / <code>LS-LeftTap</code> {{Notation|LS-LeftTap|inline}} / <code>LS-RightTap</code> {{Notation|LS-RightTap|inline}} / <code>LS-LeftRightTap</code> {{Notation|LS-LeftRightTap|inline}}
+**** Non-directional label: <code>LS</code> {{Notation|LS|inline}}
+** Right Stick Directional input
+*** Default:
+**** Tilt: <code>RS-Up</code> {{Notation|RS-Up}} / <code>RS-Down</code> {{Notation|RS-Down}} / <code>RS-Left</code> {{Notation|RS-Left}} / <code>RS-Right</code> {{Notation|RS-Right}} / <code>RS-DownRight</code> {{Notation|RS-DownRight}} / <code>RS-DownLeft</code> {{Notation|RS-DownLeft}} / <code>RS-UpRight</code> {{Notation|RS-UpRight}} / <code>RS-UpLeft</code> {{Notation|RS-UpLeft}} / <code>RS-LeftRight</code> {{Notation|RS-LeftRight}} / <code>RS-Neutral</code> {{Notation|RS-Neutral}}
+**** Tap: <code>RS-UpTap</code> {{Notation|RS-UpTap}} / <code>RS-DownTap</code> {{Notation|RS-DownTap}} / <code>RS-LeftTap</code> {{Notation|RS-LeftTap}} / <code>RS-RightTap</code> {{Notation|RS-RightTap}} / <code>RS-LeftRightTap</code> {{Notation|RS-LeftRightTap}}
+**** Non-directional label: <code>RS</code> {{Notation|RS}}
+*** Inline (same images, just resized):
+**** Normal: <code>RS-Up</code> {{Notation|RS-Up|inline}} / <code>RS-Down</code> {{Notation|RS-Down|inline}} / <code>RS-Left</code> {{Notation|RS-Left|inline}} / <code>RS-Right</code> {{Notation|RS-Right|inline}} / <code>RS-DownRight</code> {{Notation|RS-DownRight|inline}} / <code>RS-DownLeft</code> {{Notation|RS-DownLeft|inline}} / <code>RS-UpRight</code> {{Notation|RS-UpRight|inline}} / <code>RS-UpLeft</code> {{Notation|RS-UpLeft|inline}} / <code>RS-LeftRight</code> {{Notation|RS-LeftRight|inline}} / <code>RS-Neutral</code> {{Notation|RS-Neutral|inline}}
+**** Tap: <code>RS-UpTap</code> {{Notation|RS-UpTap|inline}} / <code>RS-DownTap</code> {{Notation|RS-DownTap|inline}} / <code>RS-LeftTap</code> {{Notation|RS-LeftTap|inline}} / <code>RS-RightTap</code> {{Notation|RS-RightTap|inline}} / <code>RS-LeftRightTap</code> {{Notation|RS-LeftRightTap|inline}}
+**** Non-directional label: <code>RS</code> {{Notation|RS|inline}}
+* When <code>[game]</code> = <code>SSBU</code>:
+** <code>Attack</code>
+*** Default: {{Notation|Attack|SSBU}}
+*** Inline: {{Notation|Attack|SSBU|inline}}
+** <code>Special</code>
+*** Default: {{Notation|Special|SSBU}}
+*** Inline: {{Notation|Special|SSBU|inline}}
+** <code>Jump</code>
+*** Default: {{Notation|Jump|SSBU}}
+*** Inline: {{Notation|Jump|SSBU|inline}}
+** <code>Grab</code>
+*** Default: {{Notation|Grab|SSBU}}
+*** Inline: {{Notation|Grab|SSBU|inline}}
+** <code>Shield</code>
+*** Default: {{Notation|Shield|SSBU}}
+*** Inline: {{Notation|Shield|SSBU|inline}}
+** <code>Taunt</code> / <code>UpTaunt</code> / <code>SideTaunt</code> / <code>DownTaunt</code>
+*** Default: {{Notation|Taunt|SSBU}} / {{Notation|UpTaunt|SSBU}} / {{Notation|SideTaunt|SSBU}} / {{Notation|DownTaunt|SSBU}}
+*** Inline: {{Notation|Taunt|SSBU|inline}} / {{Notation|UpTaunt|SSBU|inline}} / {{Notation|SideTaunt|SSBU|inline}} / {{Notation|DownTaunt|SSBU|inline}}
+* When <code>[game]</code> = <code>RoA2</code>:
+** <code>Attack</code>
+*** Default: {{Notation|Attack|RoA2}}
+*** Inline: {{Notation|Attack|RoA2|inline}}
+** <code>Strong</code>
+*** Default: {{Notation|Strong|RoA2}}
+*** Inline: {{Notation|Strong|RoA2|inline}}
+** <code>Special</code>
+*** Default: {{Notation|Special|RoA2}}
+*** Inline: {{Notation|Special|RoA2|inline}}
+** <code>Jump</code>
+*** Default: {{Notation|Jump|RoA2}}
+*** Inline: {{Notation|Jump|RoA2|inline}}
+** <code>Grab</code>
+*** Default: {{Notation|Grab|RoA2}}
+*** Inline: {{Notation|Grab|RoA2|inline}}
+** <code>Shield</code>
+*** Default: {{Notation|Shield|RoA2}}
+*** Inline: {{Notation|Shield|RoA2|inline}}
+** <code>Parry</code>
+*** Default: {{Notation|Parry|RoA2}}
+*** Inline: {{Notation|Parry|RoA2|inline}}
+** <code>WalkMod</code>
+*** Default: {{Notation|WalkMod|RoA2}}
+*** Inline: {{Notation|WalkMod|RoA2|inline}}
+* When <code>[game]</code> = <code>PPlus</code>:
+** <code>Attack</code>
+*** Default: {{Notation|Attack|PPlus}}
+*** Inline: {{Notation|Attack|PPlus|inline}}
+** <code>Special</code>
+*** Default: {{Notation|Special|PPlus}}
+*** Inline: {{Notation|Special|PPlus|inline}}
+** <code>Jump</code>
+*** Default: {{Notation|Jump|PPlus}}
+*** Inline: {{Notation|Jump|PPlus|inline}}
+** <code>Grab</code>
+*** Default: {{Notation|Grab|PPlus}}
+*** Inline: {{Notation|Grab|PPlus|inline}}
+** <code>Shield</code>
+*** Default: {{Notation|Shield|PPlus}}
+*** Inline: {{Notation|Shield|PPlus|inline}}
+** <code>Taunt</code> / <code>UpTaunt</code> / <code>SideTaunt</code> / <code>DownTaunt</code>
+*** Default: {{Notation|Taunt|PPlus}} / {{Notation|UpTaunt|PPlus}} / {{Notation|SideTaunt|PPlus}} / {{Notation|DownTaunt|PPlus}}
+*** Inline: {{Notation|Taunt|PPlus|inline}} / {{Notation|UpTaunt|PPlus|inline}} / {{Notation|SideTaunt|PPlus|inline}} / {{Notation|DownTaunt|PPlus|inline}}
+* When <code>[game]</code> = <code>NASB2</code>:
+** <code>Attack</code>
+*** Default: {{Notation|Attack|NASB2}}
+*** Inline: {{Notation|Attack|NASB2|inline}}
+** <code>Strong</code>
+*** Default: {{Notation|Strong|NASB2}}
+*** Inline: {{Notation|Strong|NASB2|inline}}
+** <code>Special</code>
+*** Default: {{Notation|Special|NASB2}}
+*** Inline: {{Notation|Special|NASB2|inline}}
+** <code>Jump</code>
+*** Default: {{Notation|Jump|NASB2}}
+*** Inline: {{Notation|Jump|NASB2|inline}}
+** <code>Grab</code>
+*** Default: {{Notation|Grab|NASB2}}
+*** Inline: {{Notation|Grab|NASB2|inline}}
+** <code>Shield</code>
+*** Default: {{Notation|Shield|NASB2}}
+*** Inline: {{Notation|Shield|NASB2|inline}}
+** <code>Slime</code>
+*** Default: {{Notation|Slime|NASB2}}
+*** Inline: {{Notation|Slime|NASB2|inline}}
+* When <code>[game]</code> = <code>AFQM</code>:
+** <code>Attack</code>
+*** Default: {{Notation|Attack|AFQM}}
+*** Inline: {{Notation|Attack|AFQM|inline}}
+** <code>Smash</code>
+*** Default: {{Notation|Smash|AFQM}}
+*** Inline: {{Notation|Smash|AFQM|inline}}
+** <code>Special</code>
+*** Default: {{Notation|Special|AFQM}}
+*** Inline: {{Notation|Special|AFQM|inline}}
+** <code>Jump</code>
+*** Default: {{Notation|Jump|AFQM}}
+*** Inline: {{Notation|Jump|AFQM|inline}}
+** <code>Parry</code>
+*** Default: {{Notation|Parry|AFQM}}
+*** Inline: {{Notation|Parry|AFQM|inline}}
+** <code>Air Dash</code>
+*** Default: {{Notation|AirDash|AFQM}}
+*** Inline: {{Notation|AirDash|AFQM|inline}}
+** <code>Bidou</code>
+*** Default: {{Notation|Bidou|AFQM}}
+*** Inline: {{Notation|Bidou|AFQM|inline}}

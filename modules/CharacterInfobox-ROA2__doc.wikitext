@@ -1,0 +1,7 @@
+{{#invoke:CharacterInfobox-ROA2|main|Maypul}}
+
+{{#invoke:CharacterInfobox-ROA2|main|Wrastor}}
+
+{{#invoke:CharacterInfobox-ROA2|main|Orcane}}
+
+{{#invoke:CharacterInfobox-ROA2|main|Absa}}

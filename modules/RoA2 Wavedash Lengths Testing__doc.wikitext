@@ -1,0 +1,6 @@
+{| role="presentation" class="sortable"
+|+ Wavedashes
+|-
+! Character !! Wavedash Length !! Post-Wavedash Speed !! F10 Length !! F10 Speed !! Full Distance !! Full Duration
+{{#invoke:RoA2 Wavedash Lengths Testing|main}}
+|}

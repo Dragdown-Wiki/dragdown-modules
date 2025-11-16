@@ -1,0 +1,84 @@
+The Stage Module/Template is designed to display relevant Stage data and style it appropriately. Below are the parameters. 
+
+== Parameters ==
+<pre>
+{{ Stage
+| game = (Optional). The game to use. If not given, the module will attempt to pull this information from the current page's link.
+| stageID / name = The name of the stage. This is only used for grabbing the proper images.
+| stageLength = The length of the stage's main surface.
+| platHeight = The height of the platforms from the stage's main body. To include multiple, separate the list with a semicolon. Ex. platHeight=50;25.4
+| platLength = The length of the platforms. To include multiple, separate the list with a semicolon. Ex. platHeight=20;10
+| topBlastzone = The top blastzone distance.
+| sideBlastzone = The side blastzone distance, measured from the edge of the stage's body.
+| botBlastzone = The bottom blastzone distance, measured from the stage's surface.
+| notes = (Optional). Any notes to be included in the notes box under the stage data.
+| layouts = (Optional). The number of different layouts this stage has. To be included as alternate images in the tabber. Ex. 2 indicates that the stage has it's base layout and 1 alternate layout.
+| mode = (Optional). The specific layout to feature instead of the base layout. This can be used to make a second card with separate stage data from the original.
+}}
+</pre>
+
+== Data Coloration ==
+The stage data are colorized and automatically classified by the Module using the [[Template:StageSize|StageSize Template]]. The limits for each category's limit are calculated externally and saved within Module:Stage. {{StageSize | XS }} and {{StageSize | XL}} represent statistical outliers for each measurement, while {{StageSize | M }} captures the central 50% of the data (Between Q1 and Q3). This leaves {{StageSize | S}} and {{StageSize | L}} as the measurements less than / greater than Q1 / Q3, respectively, but still are not statistical outliers. The specific cutoffs for this data for each game can be found within the module.
+
+These data boundaries are saved on a game-by-game basis, and the Module gracefully handles inputs for games that do not have data defined by not styling them. The statistical boundaries for the data is not calculated on the set of all stages the game has to offer, but rather the set of commonly-legal singles stages. For example, for Rivals of Aether II, this is the set of 10 singles stages (specifically excluding the doubles-exclusive variants). This provides a frame of reference for stage sizing with reference to singles, the most common game format. Doubles-only stages and non-legal stages can still receive styling via this template, but they are not typically included in the calculation for what defines a small, medium, or large stage (etc.).
+
+== Intended Usage ==
+The layout tabs, determined by the <nowiki>layouts</nowiki> input, are intended to display any alternate layout the stage may take on as part of a transformation. For example, when considering Super Smash Bros. Ultimate's Town & City stage, the Base Layout could be the 3-platform Town layout, Layout 2 may be the platformless transition layout, and Layout 3 may be the 2-platform City layout. For Pokemon Stadium 1, the base layout would be the standard 2-platform layout, and the alternate layouts could be used to depict the elemental transformations, if desired.
+
+Alternatively, a second Stage card may be placed on the same page to detail the specific stage measurements for each transformation. In this case, the <nowiki>mode</nowiki> tag should be used to change the main picture to the layout being discussed, to ensure readability.
+
+The Animated video tab, is intended to depict all transformations and platform movements of a moving stage.
+
+== Examples ==
+
+<pre>
+{{Template:Stage 
+| game = RoA2
+| stageID=GodaiDelta
+| stageLength=1600
+| platHeight=240
+| platLength=400
+| sideBlastzone=1680
+| topBlastzone=2030
+| bottomBlastzone=1280
+}}
+</pre>
+
+{{Template:Stage 
+| game = RoA2
+| stageID=GodaiDelta
+| stageLength=1600
+| platHeight=240
+| platLength=400
+| sideBlastzone=1680
+| topBlastzone=2030
+| bottomBlastzone=1280
+}}
+
+<pre>
+{{Template:Stage
+| game = PPlus
+| name=Battlefield
+| stageLength=136.8
+| platHeight=54.4;27.2 
+| platLength=37.6
+| sideBlastzone=155.6
+| topBlastzone=200
+| bottomBlastzone=108.8
+| notes= This is where I'd put my notes if I had any.
+| layouts= 4
+}}
+</pre>
+
+{{Template:Stage
+| game = PPlus
+| name=Battlefield
+| stageLength=136.8
+| platHeight=54.4;27.2 
+| platLength=37.6
+| sideBlastzone=155.6
+| topBlastzone=200
+| bottomBlastzone=108.8
+| notes= This is where I'd put my notes if I had any.
+| layouts= 4
+}}

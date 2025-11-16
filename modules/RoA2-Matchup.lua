@@ -1,33 +1,8 @@
 local p = {}
-local mArguments
 local cargo = mw.ext.cargo
-local cache = {}
-
 local tabber = require( 'Module:Tabber' ).renderTabber
-local splitString = require( 'Module:SplitStringToTable' ).splitStringIntoTable
-local list = require( 'Module:List' ).makeList
-
 local armor_etalus_weight = 180
-
-local function tooltip(text, hover)
-	local n = mw.html.create("span"):addClass("tooltip")
-	n:wikitext(text):node(mw.html.create("span"):addClass("tooltiptext"):wikitext(hover):done()):done()
-	return tostring(n)
-end
-local function dump(o)
-	if type(o) == "table" then
-		local s = "{ "
-		for k, v in pairs(o) do
-			if type(k) ~= "number" then
-				k = '"' .. k .. '"'
-			end
-			s = s .. "[" .. k .. "] = " .. dump(v) .. ","
-		end
-		return s .. "} "
-	else
-		return tostring(o)
-	end
-end
+local tooltip = require("Tooltip")
 
 local function calcTumblePercent(bkb, kbg, weight, damage, crouch, angle, flipper, grounded, custom_kb_threshold)
 	local tumbleThreshold = 26
@@ -162,7 +137,7 @@ local function displayTumble(row, bkb, kbg, bIgnoresWeight, weight, d, crouch, a
 	return row
 end
 
-function makeRow(traits, hit, m, colour, alt_background)
+local function makeRow(traits, hit, m, colour, alt_background)
 	local ou = '\n\n' .. m .. ': '
 	
 	local total_string = {}
@@ -236,7 +211,7 @@ function makeRow(traits, hit, m, colour, alt_background)
 	return table.concat(total_string)
 end
 
-function showTable(traits, hits)
+local function showTable(traits, hits)
 	-- Goal: generate a table with knockdown percents for each hit
 	local moveOrder = {"Jab","Ftilt","Utilt","Dtilt","Dattack","Fstrong","Ustrong","Dstrong","Nair","Fair","Fair2","Bair","Uair","Dair","Nspecial","NspecialAir","NspecialCloud","Uspecial","UspecialAir","Fspecial","Fspecial_Clone","Dspecial","DspecialAir","Dspecial_Clone","Grab","DashGrab","PivotGrab","Pummel","PummelSpecial","PummelSpecial_OLD","Fthrow","Bthrow","Uthrow","Dthrow","LedgeAttack","LedgeSpecial","LedgeSpecial_OLD","GetupAttack","GetupSpecial"}	
 	local moveContains = {Jab=1,Ftilt=1,Utilt=1,Dtilt=1,Dattack=1,Fstrong=2,Ustrong=2,Dstrong=2,Nair=3,Fair=3,Fair2=3,Bair=3,Uair=3,Dair=3,Nspecial=4,NspecialAir=4,NspecialCloud=4,Uspecial=4,UspecialAir=4,Fspecial=4,Fspecial_Clone=4,Dspecial=4,DspecialAir=4,Dspecial_Clone=4,Grab=5,DashGrab=5,PivotGrab=5,Pummel=5,PummelSpecial=5,PummelSpecial_OLD=5,Fthrow=5,Bthrow=5,Uthrow=5,Dthrow=5,LedgeAttack=6,LedgeSpecial=6,LedgeSpecial_OLD=6,GetupAttack=6,GetupSpecial=6}	
@@ -278,7 +253,7 @@ function showTable(traits, hits)
 	return mw.html.create("div"):addClass("roa2-percent-table"):node(big_table):done()
 end
 
-function createPercents(notes,host,opp)
+local function createPercents(notes,host,opp)
 	
 	local hittables = 'ROA2_HitData'
 	local hitfields = '_ID, moveID, nameID, Damage, BaseKnockback, KnockbackScaling, KnockbackAngle, bIgnoresWeight, KnockbackAngleMode, FinalBaseKnockback, ForceTumble'

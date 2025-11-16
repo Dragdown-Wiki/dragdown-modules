@@ -1,27 +1,5 @@
 local p = {}
-local mArguments
 local cargo = mw.ext.cargo
-local cache = {}
-
-local tabber = require( 'Module:Tabber' ).renderTabber
-local splitString = require( 'Module:SplitStringToTable' ).splitStringIntoTable
-local list = require( 'Module:List' ).makeList
-
-local function dump(o)
-	if type(o) == "table" then
-		local s = "{ "
-		for k, v in pairs(o) do
-			if type(k) ~= "number" then
-				k = '"' .. k .. '"'
-			end
-			s = s .. "[" .. k .. "] = " .. dump(v) .. ","
-		end
-		return s .. "} "
-	else
-		return tostring(o)
-	end
-end
-
 
 function p.main(frame)
 	local frame = mw.getCurrentFrame() 

@@ -18,7 +18,7 @@ local pikmin = {
 	["n/a"] = grey,
 }
 
-function removeTrailingS(str)
+local function removeTrailingS(str)
   if #str > 0 and str:sub(-1) == 's' then
     return str:sub(1, -2)
   else

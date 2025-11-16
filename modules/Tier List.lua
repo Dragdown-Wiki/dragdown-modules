@@ -1,5 +1,16 @@
 local p = {}
 
+-- Return the size of a table by iterating over it and counting
+local function tablelength(T)
+  local count = 0
+  for _ in pairs(T) do count = count + 1 end
+  return count
+end
+
+local function trim(s)
+  return (string.gsub(s, "^%s*(.-)%s*$", "%1"))
+end
+
 function p.drawTierList(frame)
   local wikitext = "<div class=\"tierList\">" -- initialize the wikitext with the container for the list
   local GAME = frame.args[1]:gsub("%s+", "") -- capture the target game from the first arg
@@ -45,17 +56,6 @@ function p.drawTierList(frame)
   wikitext = wikitext .. "</div>"
 
   return wikitext
-end
-
--- Return the size of a table by iterating over it and counting
-function tablelength(T)
-  local count = 0
-  for _ in pairs(T) do count = count + 1 end
-  return count
-end
-
-function trim(s)
-  return (string.gsub(s, "^%s*(.-)%s*$", "%1"))
 end
 
 return p

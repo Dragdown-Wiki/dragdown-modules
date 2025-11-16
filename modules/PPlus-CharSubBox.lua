@@ -7,21 +7,6 @@ function p.main(frame)
 	return p._main(args)
 end
 
-local function dump(o)
-	if type(o) == "table" then
-		local s = "{ "
-		for k, v in pairs(o) do
-			if type(k) ~= "number" then
-				k = '"' .. k .. '"'
-			end
-			s = s .. "[" .. k .. "] = " .. dump(v) .. ","
-		end
-		return s .. "} "
-	else
-		return tostring(o)
-	end
-end
-
 local function addRank(r)
 	local element = mw.html.create("span"):css("color", "gray"):css('font-size', 'var(--font-size-small)')
 	local lastDigit = math.fmod(r,10)

@@ -1,25 +1,14 @@
 -- This module was created by Tarkus Lee from Dustloop Wiki
 
-local p = {}
+return {
+  drawDataNotes = function(frame)
+    local name = frame.args[1]
+    local wikitext = name ~= "" and "'''" .. name .. ":'''\n" or ""
 
-function p.drawDataNotes(frame)
-  local name = frame.args[1]
+    for token in frame.args[2]:gmatch('([^;]+)') do
+      wikitext = wikitext .. "*" .. token .. "\n"
+    end
 
-  local wikitext = ""
-
-  if (name ~= "")
-  then
-    wikitext = "'''" .. name .. ":'''\n"
+    return wikitext
   end
-  
-  for token in string.gmatch(frame.args[2], '([^;]+)') do
-    note = token
-
-    wikitext = wikitext .. "*" .. note .. "\n"
-
-  end
-
-  return wikitext
-end
-
-return p
+}

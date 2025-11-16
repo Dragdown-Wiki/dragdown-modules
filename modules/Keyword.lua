@@ -3,8 +3,6 @@ local mArguments
 local cargo
 local cache = {}
 
-local splitString = require( 'Module:SplitStringToTable' ).splitStringIntoTable
-
 --- Return the Moves data and cache the data for reuse on the same page
 ---
 --- @return table
@@ -88,7 +86,7 @@ function p._main( args )
     local gameSpecifier = args['gameSpecifier']
     local label = args['label'] or args[1] or args['term']
 
-	local term = getTerm( term, gameSpecifier )
+	term = getTerm( term, gameSpecifier )
 	local html = buildTooltip(term, label)
     return tostring(html)
 end

@@ -1,40 +1,9 @@
 local p = {}
 local mArguments
 local cargo = mw.ext.cargo
-local cache = {}
 
-local tabber = require("Module:Tabber").renderTabber
-local splitString = require("Module:SplitStringToTable").splitStringIntoTable
-local list = require("Module:List").makeList
-
-local function tooltip(text, hover)
-	local n = mw.html.create("span"):addClass("tooltip")
-	n:wikitext(text):node(mw.html.create("span"):addClass("tooltiptext"):wikitext(hover):done()):done()
-	return tostring(n)
-end
-
-function dump(o)
-	if type(o) == "table" then
-		local s = "{ "
-		for k, v in pairs(o) do
-			if type(k) ~= "number" then
-				k = '"' .. k .. '"'
-			end
-			s = s .. "[" .. k .. "] = " .. dump(v) .. ","
-		end
-		return s .. "} "
-	else
-		return tostring(o)
-	end
-end
-
-local function firstToUpper(str)
-	if str ~= nil then
-		return (str:gsub("^%l", string.upper))
-	else
-		return str
-	end
-end
+local tabber = require("Tabber").renderTabber
+local tooltip = require("Tooltip")
 
 local function readModes(chara, attack)
 	local tables = "AFQM_MoveMode"

@@ -1,37 +1,11 @@
 local p = {}
-local mArguments
-local cargo = mw.ext.cargo
-local cache = {}
-
 local tabber = require( 'Module:Tabber' ).renderTabber
-local splitString = require( 'Module:SplitStringToTable' ).splitStringIntoTable
-local list = require( 'Module:List' ).makeList
 
-local function tooltip(text, hover)
-	local n = mw.html.create("span"):addClass("tooltip")
-	n:wikitext(text):node(mw.html.create("span"):addClass("tooltiptext"):wikitext(hover):done()):done()
-	return tostring(n)
-end
-local function dump(o)
-	if type(o) == "table" then
-		local s = "{ "
-		for k, v in pairs(o) do
-			if type(k) ~= "number" then
-				k = '"' .. k .. '"'
-			end
-			s = s .. "[" .. k .. "] = " .. dump(v) .. ","
-		end
-		return s .. "} "
-	else
-		return tostring(o)
-	end
-end
-
-function showTable(traits, hits)
+local function showTable(traits, hits)
 	return mw.html.create("div"):addClass("roa2-percent-table"):done()
 end
 
-function createPercents(notes,host,opp)
+local function createPercents(notes,host,opp)
 	local outputNotes = notes
 	if outputNotes == nil then
 		outputNotes = "''The following matchup notes are blank. Perhaps you can help add some?''"

@@ -1,32 +1,7 @@
 local p = {}
 local mArguments
-local cargo = mw.ext.cargo
-local cache = {}
-
 local tabber = require("Module:Tabber").renderTabber
-local splitString = require("Module:SplitStringToTable").splitStringIntoTable
-local list = require("Module:List").makeList
-
-local function tooltip(text, hover)
-	local n = mw.html.create("span"):addClass("tooltip")
-	n:wikitext(text):node(mw.html.create("span"):addClass("tooltiptext"):wikitext(hover):done()):done()
-	return tostring(n)
-end
-
-local function dump(o)
-	if type(o) == "table" then
-		local s = "{ "
-		for k, v in pairs(o) do
-			if type(k) ~= "number" then
-				k = '"' .. k .. '"'
-			end
-			s = s .. "[" .. k .. "] = " .. dump(v) .. ","
-		end
-		return s .. "} "
-	else
-		return tostring(o)
-	end
-end
+local tooltip = require("Tooltip")
 
 local function firstToUpper(str)
 	if str ~= nil then

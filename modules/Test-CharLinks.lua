@@ -33,7 +33,7 @@ local subpageOrder = {
 local baseTitle = ""
 
 -- Processes multiple values given in a semicolon-separated list
-function processList(valueList, game, character)
+local function processList(valueList, game, character)
 	if not valueList or valueList == "" then
         return ""
 	end

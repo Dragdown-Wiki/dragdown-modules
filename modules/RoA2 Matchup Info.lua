@@ -1,26 +1,7 @@
 local p = {}
-local mArguments
 local cargo = mw.ext.cargo
-local cache = {}
 
 local tabber = require( 'Module:Tabber' ).renderTabber
-local splitString = require( 'Module:SplitStringToTable' ).splitStringIntoTable
-local list = require( 'Module:List' ).makeList
-
-local function dump(o)
-	if type(o) == "table" then
-		local s = "{ "
-		for k, v in pairs(o) do
-			if type(k) ~= "number" then
-				k = '"' .. k .. '"'
-			end
-			s = s .. "[" .. k .. "] = " .. dump(v) .. ","
-		end
-		return s .. "} "
-	else
-		return tostring(o)
-	end
-end
 
 local function calcTumblePercent(bkb, kbg, weight, damage, crouch, angle, flipper)
 	damage = tonumber(damage)
@@ -56,7 +37,7 @@ local function calcTumblePercent(bkb, kbg, weight, damage, crouch, angle, flippe
 	return 0
 end
 
-function makeRow(traits, hit, m)
+local function makeRow(traits, hit, m)
 	local ou = '\n\n' .. m .. ': '
 	
 	local total_string = {}
@@ -88,7 +69,7 @@ function makeRow(traits, hit, m)
 	return table.concat(total_string)
 end
 
-function showTable(traits, hits)
+local function showTable(traits, hits)
 	-- Goal: generate a table with knockdown percents for each hit
 	local moveOrder = {"Jab","Ftilt","Utilt","Dtilt","Dattack","Fstrong","Ustrong","Dstrong","Nair","Fair","Fair2","Bair","Uair","Dair","Nspecial","NspecialAir","NspecialCloud","Uspecial","UspecialAir","Fspecial","Fspecial_Clone","Dspecial","DspecialAir","Dspecial_Clone","Grab","DashGrab","PivotGrab","Pummel","PummelSpecial","PummelSpecial_OLD","Fthrow","Bthrow","Uthrow","Dthrow","LedgeAttack","LedgeSpecial","LedgeSpecial_OLD","GetupAttack","GetupSpecial"}	
 	local moveContains = {Jab=1,Ftilt=1,Utilt=1,Dtilt=1,Dattack=1,Fstrong=1,Ustrong=1,Dstrong=1,Nair=1,Fair=1,Fair2=1,Bair=1,Uair=1,Dair=1,Nspecial=1,NspecialAir=1,NspecialCloud=1,Uspecial=1,UspecialAir=1,Fspecial=1,Fspecial_Clone=1,Dspecial=1,DspecialAir=1,Dspecial_Clone=1,Grab=1,DashGrab=1,PivotGrab=1,Pummel=1,PummelSpecial=1,PummelSpecial_OLD=1,Fthrow=1,Bthrow=1,Uthrow=1,Dthrow=1,LedgeAttack=1,LedgeSpecial=1,LedgeSpecial_OLD=1,GetupAttack=1,GetupSpecial=1}	

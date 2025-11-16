@@ -1,40 +1,8 @@
 local p = {}
 local mArguments
 local cargo = mw.ext.cargo
-local cache = {}
-
 local tabber = require("Module:Tabber").renderTabber
-local splitString = require("Module:SplitStringToTable").splitStringIntoTable
-local list = require("Module:List").makeList
-
-local function tooltip(text, hover)
-	local n = mw.html.create("span"):addClass("tooltip")
-	n:wikitext(text):node(mw.html.create("span"):addClass("tooltiptext"):wikitext(hover):done()):done()
-	return tostring(n)
-end
-
-local function dump(o)
-	if type(o) == "table" then
-		local s = "{ "
-		for k, v in pairs(o) do
-			if type(k) ~= "number" then
-				k = '"' .. k .. '"'
-			end
-			s = s .. "[" .. k .. "] = " .. dump(v) .. ","
-		end
-		return s .. "} "
-	else
-		return tostring(o)
-	end
-end
-
-local function firstToUpper(str)
-	if str ~= nil then
-		return (str:gsub("^%l", string.upper))
-	else
-		return str
-	end
-end
+local tooltip = require("Tooltip")
 
 local function readModes(chara, attack)
 	local tables = "RushRev_MoveMode"
@@ -364,24 +332,6 @@ local function showHitUniques(hasArticle, result, unique)
 	return
 end
 
-local function getArticles(articleData)
-	local fields =
-		"ArticleName,bIsProjectile,bRotateWithVelocity,bInheritOwnerChargeValue,bIsAttachedToOwner,ParryReaction,HasHitReaction,GotHitReaction,bCanBeHitByOwner,bCanDetectOwner,GroundCollisionResponse,WallCollisionResponse,CeilingCollisionResponse,ShouldGetOutOfGroundOnSpawn"
-
-	local hitRow = mw.html.create("tr")
-	for k, v in ipairs(mysplit(fields, ",")) do
-		local assignedValue = firstToUpper(articleData[v])
-		if assignedValue == nil then
-			assignedValue = "N/A"
-		end
-		local cell = mw.html.create("td"):wikitext(assignedValue):done()
-		hitRow:node(cell)
-	end
-
-	hitRow:done()
-	return hitRow
-end
-
 local function getHits(hasArticle, result, mode, hitData)
 	--chara, attackID, hitID, hitMoveID, hitName, hitActive, customShieldSafety, uniques
 	local hitRow = mw.html.create("tr"):addClass("hit-row")
@@ -402,29 +352,6 @@ local function getHits(hasArticle, result, mode, hitData)
 	return hitRow
 end
 
-local function getThrows(result, mode, hitData)
-	local hitRow = mw.html.create("tr")
-	hitRow
-		:tag("td")
-		:wikitext(hitData.name)
-		:tag("td")
-		:wikitext(result.Damage .. "%")
-		:tag("td")
-		:wikitext(hitData.active)
-		:tag("td")
-		:wikitext(string.format("%.1f", result.BaseKnockback) .. " + " .. result.KnockbackScaling)
-		:tag("td")
-		:wikitext(makeAngleDisplay(result.KnockbackAngle))
-		:tag("td")
-		:wikitext(calcSimpleTumble(result))
-		:tag("td")
-		:wikitext("N/A")
-		:tag("td")
-		:wikitext(showThrowUniques(result, hitData.unique))
-		:done()
-	return hitRow
-end
-
 local function getAdvHits(result, mode, hitData, articleData)
 	--chara, attackID, hitID, hitMoveID, hitName, hitActive, customShieldSafety, uniques
 
@@ -434,27 +361,6 @@ local function getAdvHits(result, mode, hitData, articleData)
 	for k, v in ipairs(mysplit(columns, ",")) do
 		local assignedValue = ""
 		assignedValue = result[v]
-		local cell = mw.html.create("td"):wikitext(assignedValue):done()
-		hitRow:node(cell)
-	end
-
-	hitRow:done()
-	return hitRow
-end
-
-local function getAdvThrows(result, mode, hitData)
-	local fields = "HitstunMultiplier,bTechable,ForceTumble,HitstunAnimationStateOverride,ReleaseOffset"
-
-	local hitRow = mw.html.create("tr")
-	hitRow:node(mw.html.create("td"):wikitext(hitData.name))
-
-	for k, v in ipairs(mysplit(fields, ",")) do
-		local assignedValue = ""
-		if v == "HitstunMultiplier" then
-			assignedValue = result[v] .. "×"
-		else
-			assignedValue = result[v]
-		end
 		local cell = mw.html.create("td"):wikitext(assignedValue):done()
 		hitRow:node(cell)
 	end

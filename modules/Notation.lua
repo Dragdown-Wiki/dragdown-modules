@@ -1,11 +1,12 @@
 local function basic(name)
+	local size = "x25"
+
 	if name == "GCN_B" then
       size = "18"
     elseif name == "GCN_Y" or name == "GCN_Z" or name == "GCN_L" or name == "GCN_R" then
       size = "28"
-    else
-      size = "x25"
     end
+
 	return "[[File:ROA2_" .. name .. "_Prompt.PNG|" .. size .. "px|link=]]"
 end
 

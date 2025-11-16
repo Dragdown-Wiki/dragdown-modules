@@ -45,7 +45,7 @@ local function selectLimits(game)
 end
 
 -- Classifies a measurement into the appropriate StageSize range
-function classifyMeasurement(value, measureKey)
+local function classifyMeasurement(value, measureKey)
 	-- If limits aren't defined, return the unformatted value. This will happen if the game isn't supported yet
 	if limits == nil then
 		return value
@@ -83,7 +83,7 @@ function classifyMeasurement(value, measureKey)
 end
 
 -- Processes multiple values given in a semicolon-separated list into StageSize ranges
-function processList(valueList, measureKey)
+local function processList(valueList, measureKey)
 	if not valueList or valueList == "" then
         return ""
     end
@@ -95,13 +95,13 @@ function processList(valueList, measureKey)
     return table.concat(values, "<br>")
 end
 
-function tooltip(title, tip)
+local function tooltip(title, tip)
 	--{{tt|Side Blastzone Distance|This distance is measured from the ledge to the blastzone.}}
 	local wikitext = '{{tt|' .. title ..'|'.. tip ..'}}'
 	return mw.getCurrentFrame():preprocess(wikitext)
 end
 
-function buildTabber(gameID, stageID, numLayouts, modeID)
+local function buildTabber(gameID, stageID, numLayouts, modeID)
 	local opening = '<tabber>\n'
     
     local layoutString = ''

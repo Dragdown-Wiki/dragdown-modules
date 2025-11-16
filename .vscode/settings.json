@@ -1,0 +1,6 @@
+{
+  "Lua.diagnostics.globals": ["mw"],
+  "Lua.codeLens.enable": true,
+  "Lua.runtime.version": "Lua 5.1",
+  "editor.formatOnSave": false // dont auto format for now
+}

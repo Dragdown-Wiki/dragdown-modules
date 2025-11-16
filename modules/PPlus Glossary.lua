@@ -4,7 +4,7 @@
 
 return {
 	main = function(frame)
-		local args = require("Module:Arguments").getArgs(frame)
+		local args = require("Arguments").getArgs(frame)
 
 		local tableElem = mw.html.create("table"):addClass("wikitable")
 

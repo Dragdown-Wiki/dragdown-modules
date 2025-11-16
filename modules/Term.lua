@@ -2,7 +2,7 @@ local p = {}
 local namespaceMap = { pplus = "PPlus", roa2 = "RoA2", ssbu = "SSBU", nasb2 = "NASB2" }
 
 function p.main(frame)
-	local args = require("Module:Arguments").getArgs(frame)
+	local args = require("Arguments").getArgs(frame)
 	local game = (args[2] and args[3]) and args[1] or mw.title.getCurrentTitle().rootText
 	local namespace = namespaceMap[string.lower(game)] or "RoA2"
 	local term = args[3] and args[2] or args[1]

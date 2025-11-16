@@ -24,7 +24,7 @@ local p = {}
 local function getArgs(frame)
 	-- Fetches the arguments from the parent frame. Whitespace is trimmed and
 	-- blanks are removed.
-	mArguments = require('Module:Arguments')
+	mArguments = require('Arguments')
 	return mArguments.getArgs(frame, {parentOnly = true})
 end
 
@@ -98,7 +98,7 @@ local function formatDisplay(parsed, options)
 end
 
 local function missingArgError(target)
-	mError = require('Module:Error')
+	mError = require('Error')
 	return mError.error{message =
 		'Error: no link or target specified! ([[' .. target .. '#Errors|help]])'
 	}
@@ -110,7 +110,7 @@ end
 
 function p.formatLink(frame)
 	-- The formatLink export function, for use in templates.
-	yesno = require('Module:Yesno')
+	yesno = require('Yesno')
 	local args = getArgs(frame)
 	local link = args[1] or args.link
 	local target = args[3] or args.target

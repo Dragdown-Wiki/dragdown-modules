@@ -119,7 +119,7 @@ end
 ---
 --- @return string
 function cargo.getQueryResultsFromWikitext( frame )
-	mArguments = require( 'Module:Arguments' )
+	mArguments = require( 'Arguments' )
 	local templateArgs = mArguments.getArgs( frame )
 
 	local tables = templateArgs[ 'tables' ]

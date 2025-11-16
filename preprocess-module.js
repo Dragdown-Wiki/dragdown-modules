@@ -15,8 +15,7 @@ export const preprocessModule = (luaString) => {
     (match, requiredModuleName) => {
       if (
         requiredModuleName === "libraryUtil" ||
-        requiredModuleName === "strict" ||
-        requiredModuleName.startsWith("Module:")
+        requiredModuleName === "strict"
       ) {
         return match;
       }

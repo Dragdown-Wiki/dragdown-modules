@@ -11,14 +11,14 @@ local p = {}
 --
 -- @return string - Formatted error message in wikitext
 local function makeWikitextError( msg )
-	mError = require( 'Module:Error' )
+	mError = require( 'Error' )
 	return mError.error {
 		message = 'Error: ' .. msg .. '.'
 	}
 end
 
 function p.mbox( frame )
-	mArguments = require( 'Module:Arguments' )
+	mArguments = require( 'Arguments' )
 	local args = mArguments.getArgs( frame )
 	local title = args[ 1 ] or args[ 'title' ]
 	local text = args[ 2 ] or args[ 'text' ]

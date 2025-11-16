@@ -3,7 +3,7 @@
 
 local libUtil = require('libraryUtil')
 local checkType = libUtil.checkType
-local mTableTools = require('Module:TableTools')
+local mTableTools = require('TableTools')
 
 local p = {}
 
@@ -178,7 +178,7 @@ end
 
 for listType in pairs(listTypes) do
 	p[listType] = function (frame)
-		local mArguments = require('Module:Arguments')
+		local mArguments = require('Arguments')
 		local origArgs = mArguments.getArgs(frame)
 		-- Copy all the arguments to a new table, for faster indexing.
 		local args = {}

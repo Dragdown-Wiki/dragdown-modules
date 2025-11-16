@@ -11,7 +11,7 @@ local function getGlossaryData( gameSpecifier )
     if #cache > 0 then return cache end
 
     -- Lazy initalize Module:Cargo
-    cargo = require( 'Module:Cargo' )
+    cargo = require( 'Cargo' )
 
     local tables = 'Glossary'
     local fields = 'term,definition,gameSpecifier'
@@ -68,7 +68,7 @@ local function buildTooltip(term, label)
 end
 
 function p.main(frame)
-	mArguments = require( 'Module:Arguments' )
+	mArguments = require( 'Arguments' )
 	local args = mArguments.getArgs(frame)
 	return p._main(args)
 end

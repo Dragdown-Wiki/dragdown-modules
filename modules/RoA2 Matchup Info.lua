@@ -1,7 +1,7 @@
 local p = {}
 local cargo = mw.ext.cargo
 
-local tabber = require( 'Module:Tabber' ).renderTabber
+local tabber = require( 'Tabber' ).renderTabber
 
 local function calcTumblePercent(bkb, kbg, weight, damage, crouch, angle, flipper)
 	damage = tonumber(damage)
@@ -107,7 +107,7 @@ local function showTable(traits, hits)
 end
 
 function p.main(frame)
-	local args = require("Module:Arguments").getArgs(frame)
+	local args = require("Arguments").getArgs(frame)
 	local host = args['host']
 	local opp = args['opp']
 

@@ -91,7 +91,7 @@ local function createWavedashLengths()
 end
 
 function p.main(frame)
-	mArguments = require( 'Module:Arguments' )
+	mArguments = require( 'Arguments' )
 	local args = mArguments.getArgs(frame)
 	return p._main(args)
 end

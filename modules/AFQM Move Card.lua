@@ -711,7 +711,7 @@ end
 
 local function getCardHTML(chara, attack, desc, advDesc)
 	-- Lazy Load automated frame chart generator
-	-- local autoChart = require('Module:FrameChart').autoChart
+	-- local autoChart = require('FrameChart').autoChart
 	-- Outer Container of the card
 	local card = mw.html.create("div"):addClass("attack-container")
 
@@ -844,7 +844,7 @@ local function getCardHTML(chara, attack, desc, advDesc)
 end
 
 function p.main(frame)
-	mArguments = require("Module:Arguments")
+	mArguments = require("Arguments")
 	local args = mArguments.getArgs(frame)
 	return p._main(args)
 end

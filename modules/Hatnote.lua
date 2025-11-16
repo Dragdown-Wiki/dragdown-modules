@@ -20,7 +20,7 @@ local p = {}
 local function getArgs(frame)
     -- Fetches the arguments from the parent frame. Whitespace is trimmed and
     -- blanks are removed.
-    mArguments = require('Module:Arguments')
+    mArguments = require('Arguments')
     return mArguments.getArgs(frame, {parentOnly = true})
 end
 
@@ -73,7 +73,7 @@ function p.makeWikitextError(msg, helpLink, addTrackingCategory, title)
     -- is added.
     checkType('makeWikitextError', 1, msg, 'string')
     checkType('makeWikitextError', 2, helpLink, 'string', true)
-    yesno = require('Module:Yesno')
+    yesno = require('Yesno')
     title = title or mw.title.getCurrentTitle()
     -- Make the help link text.
     local helpText

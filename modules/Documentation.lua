@@ -1,9 +1,9 @@
 -- <nowiki>
-local dependencyList = require( 'Module:DependencyList' )
-local hatnote = require( 'Module:Hatnote' )._hatnote
-local mbox = require( 'Module:Mbox' )._mbox
-local i18n = require( 'Module:i18n' ):new()
-local TNT = require( 'Module:Translate' ):new()
+local dependencyList = require( 'DependencyList' )
+local hatnote = require( 'Hatnote' )._hatnote
+local mbox = require( 'Mbox' )._mbox
+local i18n = require( 'i18n' ):new()
+local TNT = require( 'Translate' ):new()
 local lang = mw.getContentLanguage()
 local p = {}
 
@@ -54,7 +54,7 @@ function p.doc( frame )
         elseif title.namespace == 828 then -- Module namespace
             cats = '[[Category:' .. string.format( t( 'category_documentation' ), t( 'category_' .. pageType ) ) .. '|' .. title.baseText .. ']]'
             ret2 = dependencyList._main()
-            ret2 = ret2 .. require('Module:Module toc').main()
+            ret2 = ret2 .. require('Module toc').main()
         else
             cats = ''
             ret2 = ''
@@ -204,7 +204,7 @@ function p.doc( frame )
 		table.insert( ret3, '<div class="documentation-modulestats">' )
 
 		-- Function list
-		table.insert( ret3, require( 'Module:Module toc' ).main() )
+		table.insert( ret3, require( 'Module toc' ).main() )
 
 		-- Unit tests
 		local testcaseTitle = title.baseText .. '/testcases'

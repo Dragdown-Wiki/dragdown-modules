@@ -8,8 +8,8 @@
 --------------------------------------------------------------------------------
 
 local mArguments --initialize lazily
-local mFormatLink = require('Module:Format link')
-local mHatnote = require('Module:Hatnote')
+local mFormatLink = require('Format link')
+local mHatnote = require('Hatnote')
 local libraryUtil = require('libraryUtil')
 local checkType = libraryUtil.checkType
 local p = {}
@@ -203,7 +203,7 @@ end
 
 -- As _forSee, but uses the frame.
 function p.forSee (frame, from, options)
-    mArguments = require('Module:Arguments')
+    mArguments = require('Arguments')
     return p._forSee(mArguments.getArgs(frame), from, options)
 end
 

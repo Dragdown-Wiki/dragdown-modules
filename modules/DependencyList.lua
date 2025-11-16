@@ -6,15 +6,15 @@ require("strict");
 
 local p = {}
 local libraryUtil = require( 'libraryUtil' )
-local arr = require( 'Module:Array' )
-local yn = require( 'Module:Yesno' )
-local param = require( 'Module:Paramtest' )
-local userError = require("Module:User error")
-local hatnote = require('Module:Hatnote')._hatnote
-local mHatlist = require('Module:Hatnote list')
-local mbox = require( 'Module:Mbox' )._mbox
-local i18n = require( 'Module:i18n' ):new()
-local TNT = require( 'Module:Translate' ):new()
+local arr = require( 'Array' )
+local yn = require( 'Yesno' )
+local param = require( 'Paramtest' )
+local userError = require("User error")
+local hatnote = require('Hatnote')._hatnote
+local mHatlist = require('Hatnote list')
+local mbox = require( 'Mbox' )._mbox
+local i18n = require( 'i18n' ):new()
+local TNT = require( 'Translate' ):new()
 
 local moduleIsUsed = false
 local shouldAddCategories = false
@@ -146,7 +146,7 @@ local function isDynamicPath( str )
 end
 
 
---- Used in case a construct like 'require( "Module:wowee/" .. isTheBest )' is found.
+--- Used in case a construct like 'require( "wowee/" .. isTheBest )' is found.
 --- Will return a list of pages which satisfy this pattern where 'isTheBest' can take any value.
 ---@param query string
 ---@return string[]

@@ -28,7 +28,7 @@ end
 
 return {
 	main = function(frame)
-		local args = require('Module:Arguments').getArgs(frame)
+		local args = require('Arguments').getArgs(frame)
 		local colour = args[1]
 		local config = pikmin[removeTrailingS(string.lower(colour))]
 		local icon = config.icon and ("[[File:Pikmin_" .. config.icon .. ".png|x25px|link=]] ") or ""

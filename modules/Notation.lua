@@ -202,7 +202,7 @@ end
 
 return {
 	main = function(frame)
-		local args = require('Module:Arguments').getArgs(frame)
+		local args = require('Arguments').getArgs(frame)
 		local rootText = mw.title.getCurrentTitle().rootText
 		local secondArgLower = args[2] and args[2]:lower()
 		local gameByArg = gameConfig[secondArgLower] and secondArgLower

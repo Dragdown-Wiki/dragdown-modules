@@ -1,5 +1,5 @@
 local p = {}
-local tabber = require( 'Module:Tabber' ).renderTabber
+local tabber = require( 'Tabber' ).renderTabber
 
 local function showTable(traits, hits)
 	return mw.html.create("div"):addClass("roa2-percent-table"):done()
@@ -32,7 +32,7 @@ local function createPercents(notes,host,opp)
 end
 
 function p.main(frame)
-	local args = require("Module:Arguments").getArgs(frame)
+	local args = require("Arguments").getArgs(frame)
 	local host = args['host'] or mw.title.getCurrentTitle().basePageTitle.subpageText
 	local opp = args['mu']
 	

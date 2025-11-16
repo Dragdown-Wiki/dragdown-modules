@@ -9,7 +9,7 @@ metatable.__index = methodtable
 
 local libraryUtil = require( 'libraryUtil' )
 local checkType = libraryUtil.checkType
-local i18n = require( 'Module:i18n' ):new()
+local i18n = require( 'i18n' ):new()
 
 --- Cache table containing i18n data at the 'data' key, and a key map at the 'keys' key
 --- The table is keyed by the i18n.json module name

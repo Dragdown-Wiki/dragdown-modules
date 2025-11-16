@@ -1,6 +1,6 @@
 local p = {}
 local cargo = mw.ext.cargo
-local tabber = require( 'Module:Tabber' ).renderTabber
+local tabber = require( 'Tabber' ).renderTabber
 local armor_etalus_weight = 180
 local tooltip = require("Tooltip")
 
@@ -312,7 +312,7 @@ local function createPercents(notes,host,opp)
 end
 
 function p.main(frame)
-	local args = require("Module:Arguments").getArgs(frame)
+	local args = require("Arguments").getArgs(frame)
 	local host = args['host'] or mw.title.getCurrentTitle().basePageTitle.subpageText
 	local opp = args['mu']
 	

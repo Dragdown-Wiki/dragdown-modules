@@ -442,7 +442,7 @@ end
 function p.length(t, prefix)
 	-- requiring module inline so that [[Module:Exponential search]] which is
 	-- only needed by this one function doesn't get millions of transclusions
-	local expSearch = require("Module:Exponential search")
+	local expSearch = require("Exponential search")
 	checkType('length', 1, t, 'table')
 	checkType('length', 2, prefix, 'string', true)
 	return expSearch(function (i)

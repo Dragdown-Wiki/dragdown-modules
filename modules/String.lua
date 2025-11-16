@@ -112,7 +112,7 @@ This function returns a substring from the source string that matches a
 specified pattern. It is exported for use in other modules
 
 Usage:
-strmatch = require("Module:String")._match
+strmatch = require("String")._match
 sresult = strmatch( s, pattern, start, match, plain, nomatch )
 
 Parameters

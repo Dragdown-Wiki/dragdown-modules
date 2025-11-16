@@ -1,6 +1,6 @@
 return {
 	main = function(frame)
-		local args = require("Module:Arguments").getArgs(frame)
+		local args = require("Arguments").getArgs(frame)
 		local chara = args[2] or args.chara or args[1] or ""
 		local game = args.game or mw.title.getCurrentTitle().rootText or ""
 

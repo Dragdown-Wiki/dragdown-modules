@@ -27,7 +27,7 @@ setmetatable(Array, {
 })
 
 -- function Array.__tostring(arr)
--- 	-- local dumpObject = require('Module:Logger').dumpObject
+-- 	-- local dumpObject = require('Logger').dumpObject
 -- 	require 'log'
 -- 	local dumpObject = dumpObject
 -- 	local mt = getmetatable(arr)

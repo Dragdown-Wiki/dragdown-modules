@@ -9,7 +9,7 @@ end
 
 return {
    main = function(frame)
-      local text = require("Module:Arguments").getArgs(frame)[1]
+      local text = require("Arguments").getArgs(frame)[1]
       local e = {}
       local tag = {}
 

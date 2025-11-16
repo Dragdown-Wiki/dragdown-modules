@@ -39,7 +39,7 @@ local defs = {
 
 return {
 	main = function(frame)
-		local args = require('Module:Arguments').getArgs(frame)
+		local args = require('Arguments').getArgs(frame)
 		local choice = args[1]
 		local config = defs[string.upper(choice)]
 

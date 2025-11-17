@@ -27,7 +27,7 @@ function p._main( args )
 	
 	local table = mw.html.create("table"):addClass("stripe"):css("width", "100%"):attr("cellspacing", "0")
 
-	local chara = args["chara"]
+	local chara = args["chara"] or "Knuckles"
 	local portrait = "[[File:PPlus_" .. chara .. "_Portrait.png|300px]]"
 	if args["portrait"] then
 		portrait = args["portrait"]

@@ -1,73 +1,28 @@
+---@diagnostic disable: need-check-nil, lowercase-global
 local p = {}
 local mArguments
-local cargo = mw.ext.cargo
-local cache = {}
-
+local utils = require("Move Card Utils")
 local tabber = require("Tabber").renderTabber
-local splitString = require("SplitStringToTable").splitStringIntoTable
-local list = require("List").makeList
-
-local function tooltip(text, hover)
-	local n = mw.html.create("span"):addClass("tooltip")
-	n:wikitext(text):node(mw.html.create("span"):addClass("tooltiptext"):wikitext(hover):done()):done()
-	return tostring(n)
-end
-
-local function dump(o)
-	if type(o) == "table" then
-		local s = "{ "
-		for k, v in pairs(o) do
-			if type(k) ~= "number" then
-				k = '"' .. k .. '"'
-			end
-			s = s .. "[" .. k .. "] = " .. dump(v) .. ","
-		end
-		return s .. "} "
-	else
-		return tostring(o)
-	end
-end
-
-local function firstToUpper(str)
-	if str ~= nil then
-		return (str:gsub("^%l", string.upper))
-	else
-		return str
-	end
-end
+local tooltip = require("Tooltip")
 local cargo = mw.ext.cargo
-local tables = "PPlus_CharacterData"
-local fields = "chara, Weight"
-local args = { orderBy = "Weight" }
-local weightObject = cargo.query(tables, fields, args)
+local weightObject = cargo.query("PPlus_CharacterData", "chara, Weight", { orderBy = "Weight" })
 
 local function readModes(chara, attack)
-	local tables = "PPlus_MoveMode"
-	local fields =
-		"chara, attack, attackID, mode, startup, startupNotes, totalActive, totalActiveNotes, endlag, endlagNotes, cancel, cancelNotes, landingLag, landingLagNotes, totalDuration, totalDurationNotes,iasa,autocancel,autocancelNotes,hitID,hitSubactionID,hitName,hitActive,customShieldSafety,uniqueField,frameChart, articleID, notes"
-	local args = {
-		where = 'PPlus_MoveMode.chara="' .. chara .. '" and PPlus_MoveMode.attack="' .. attack .. '"',
-		orderBy = "_ID",
-	}
-	local results = cargo.query(tables, fields, args)
-	return results
+	return cargo.query(
+		"PPlus_MoveMode",
+		"chara, attack, attackID, mode, startup, startupNotes, totalActive, "
+		.."totalActiveNotes, endlag, endlagNotes, cancel, cancelNotes, landingLag, "
+		.."landingLagNotes, totalDuration, totalDurationNotes,iasa,autocancel,"
+		.."autocancelNotes,hitID,hitSubactionID,hitName,hitActive,customShieldSafety,"
+		.."uniqueField,frameChart, articleID, notes",
+		{
+			where = 'PPlus_MoveMode.chara="' .. chara .. '" and PPlus_MoveMode.attack="' .. attack .. '"',
+			orderBy = "_ID",
+		}
+	)
 end
 
-local function getImagesWikitext(t)
-	local wikitextTable = {}
-	for i, data in ipairs(t) do
-		-- MediaWiki image syntax
-		-- @see https://www.mediawiki.org/wiki/Help:Images/en#Rendering_a_single_image
-		local image = string.format("[[File:%s|thumb|center|210x210px]]", data.file)
-		local caption = tostring(
-			mw.html.create("div"):addClass("gallerytext"):css("text-align", "center"):wikitext(data.caption or "")
-		)
-		table.insert(wikitextTable, image)
-		table.insert(wikitextTable, caption)
-	end
-
-	return wikitextTable
-end
+local getImagesWikitext = require("GetImagesWikitext")
 
 local function mysplit(inputstr, sep)
 	if sep == nil then
@@ -196,17 +151,6 @@ local function calcFullTumble(result, crouch, throw, name)
 	return tostring(row)
 end
 
-local function drawFrame(frames, frameType)
-	local output = ""
-	for i = 1, tonumber(frames) do
-		local frameDataHtml = mw.html.create("div")
-		frameDataHtml:addClass("frame-data frame-data-" .. frameType)
-		frameDataHtml:done()
-		output = output .. tostring(frameDataHtml)
-	end
-	return output
-end
-
 local function drawFrameData(s1, s2, s3, s4)
 	currentFrame = 0
 
@@ -238,12 +182,20 @@ local function drawFrameData(s1, s2, s3, s4)
 	first_active_frame = totalStartup + 1
 	counter = 1
 	if s2 and s2 ~= "N/A" then
+		-- s2 = "38...1-4"
 		csplit = mysplit(s2, ",")
 		ATL = #csplit
 		for i = 1, ATL do
 			hyphen = #(mysplit(csplit[i], "-"))
 			startFrame = mysplit(csplit[i], "-")[1]
+
+			if startFrame:find("...") then
+				startFrame = mysplit(startFrame, "...")[1]
+			end
+
 			endFrame = mysplit(csplit[i], "-")[hyphen]
+
+			-- error: comparing number with nil
 			if tonumber(startFrame) > first_active_frame + 1 then
 				active[counter] = -1 * (tonumber(startFrame) - first_active_frame - 1)
 				counter = counter + 1
@@ -377,7 +329,7 @@ local function calcShieldSafety(result, mode, active, custom)
 		local active1 = mysplit(active, ", ")
 		active1 = active1[#active1]
 		local active2 = mysplit(active1, "-")
-		local first = mode.totalDuration - active2[1]
+		local first = mode.totalDuration - active2[1] -- problem: active2[1] = "...1"
 		local second = mode.totalDuration - active2[#active2]
 		if mode.iasa then
 			first = mode.iasa - active2[1]
@@ -404,62 +356,6 @@ local function calcShieldSafety(result, mode, active, custom)
 	end
 end
 
-local function makeAngleDisplay(angle, flipper)
-	angle = tonumber(angle)
-	local angleColor = mw.html.create("span"):wikitext(angle)
-	if angle > 360 then
-		angleColor:css("color", "#ff0000")
-	elseif angle <= 45 or angle >= 315 then
-		angleColor:css("color", "#1ba6ff")
-	elseif angle > 225 then
-		angleColor:css("color", "#ff6b6b")
-	elseif angle > 135 then
-		angleColor:css("color", "#de7cd1")
-	elseif angle > 45 then
-		angleColor:css("color", "#16df53")
-	end
-
-	local display = mw.html.create("span")
-	local div1 = mw.html.create("div"):css("position", "relative"):css("top", "0"):css("max-width", "256px")
-
-	if angle < 360 then
-		div1:tag("div")
-			:css("transform", "rotate(-" .. angle .. "deg)")
-			:css("z-index", "0")
-			:css("position", "absolute")
-			:css("top", "0")
-			:css("left", "0")
-			:css("transform-origin", "center center")
-			:wikitext("[[File:PPlus_AngleComplex_BG.svg|256px|link=]]")
-			:done()
-			:tag("div")
-			:css("z-index", "1")
-			:css("position", "relative")
-			:css("top", "0")
-			:css("left", "0")
-			:wikitext("[[File:PPlus_AngleComplex_MG.svg|256px|link=]]")
-			:done()
-			:tag("div")
-			:css("transform", "rotate(-" .. angle .. "deg)")
-			:css("z-index", "2")
-			:css("position", "absolute")
-			:css("top", "0")
-			:css("left", "0")
-			:css("transform-origin", "center center")
-			:wikitext("[[File:PPlus_AngleComplex_FG.svg|256px|link=]]")
-			:done()
-		div1:wikitext("Angle Flipper: " .. flipper)
-		div1:done()
-		display:node(div1):wikitext("[[File:PPlus_AngleComplex_Key.svg|256px|link=]]")
-		display:done()
-	else
-		div1:wikitext("Angle Flipper: " .. flipper)
-		div1:done()
-		display:node(div1)
-		display:done()
-	end
-	return tostring(tooltip(tostring(angleColor), tostring(display)))
-end
 
 local function showHitUniques(hasArticle, result, unique)
 	local listOfUniques = {}
@@ -565,7 +461,7 @@ local function getThrows(result, mode, hitData)
 		:tag("td")
 		:wikitext(string.format("%.1f", result.BaseKnockback) .. " + " .. result.KnockbackScaling)
 		:tag("td")
-		:wikitext(makeAngleDisplay(result.KnockbackAngle))
+		:wikitext(utils.makeAngleDisplay(result.KnockbackAngle))
 		:tag("td")
 		:wikitext(calcSimpleTumble(result))
 		:tag("td")
@@ -686,12 +582,22 @@ local function createMode(hasArticle, mode, motherhits, hitresults, throwresults
 	columnValues["startup"] = "N/A"
 	if mode.startup == nil then
 		if mode.totalActive ~= nil then
-			local processed_active = mode.totalActive
+			local processed_active = mode.totalActive -- "38...1-4"
 			if string.find(processed_active, "+") then
 				processed_active = mysplit(processed_active, "+")[1]
 			end
 			columnValues["startup"] = mysplit(mysplit(processed_active, ",")[1], "-")[1]
-			mode.startup = mysplit(mysplit(processed_active, ",")[1], "-")[1] - 1
+
+			local firstSplit = mysplit(processed_active, ",") -- ["38...1-4"]
+			local firstAccess = firstSplit[1] -- "38...1-4"
+			local secondSplit = mysplit(firstAccess, "-") -- ["38...1", "4"]
+			local secondAccess = secondSplit[1] -- "38...1"
+
+			if secondAccess:find("...") then
+				mode.startup = mysplit(secondAccess, "...")[1] - 1
+			else
+				mode.startup = secondAccess - 1
+			end
 		else
 			columnValues["startup"] = "N/A"
 		end
@@ -1012,41 +918,7 @@ local function createAdvMode(mode, articleList, motherhits, hitresults, throwres
 	return tostring(finalreturn)
 end
 
-local function getImageGallery(chara, attack)
-	local tables = "PPlus_MoveMode, PPlus_MoveMode__image, PPlus_MoveMode__caption"
-	local fields = "image, caption"
-	local args = {
-		join = "PPlus_MoveMode__image._rowID=PPlus_MoveMode._ID, PPlus_MoveMode__image._rowID=PPlus_MoveMode__caption._rowID, PPlus_MoveMode__image._position=PPlus_MoveMode__caption._position",
-		where = 'PPlus_MoveMode.chara="' .. chara .. '" and PPlus_MoveMode.attack="' .. attack .. '"',
-		orderBy = "_ID",
-		groupBy = "PPlus_MoveMode__image._value",
-	}
-	local results = cargo.query(tables, fields, args)
 
-	local imageCaptionPairs = {}
-
-	for k, v in pairs(results) do
-		local imageList = mysplit(results[k]["image"], "\\")
-		local captionList = mysplit(results[k]["caption"], "\\")
-		if imageList ~= nil then
-			for k, v in pairs(imageList) do
-				if captionList == nil then
-					table.insert(imageCaptionPairs, { file = imageList[k], caption = "" })
-				else
-					table.insert(imageCaptionPairs, { file = imageList[k], caption = captionList[k] })
-				end
-			end
-		end
-	end
-	local container = mw.html.create("div"):addClass("attack-gallery-image")
-	container:wikitext(table.concat(getImagesWikitext(imageCaptionPairs)))
-
-	return tostring(container)
-end
-
-local function getHitboxGallery(chara, attack)
-	return "Hitboxes are currently unavailable."
-end
 
 local function getCardHTML(chara, attack, desc, advDesc)
 	-- Lazy Load automated frame chart generator
@@ -1055,12 +927,12 @@ local function getCardHTML(chara, attack, desc, advDesc)
 	local card = mw.html.create("div"):addClass("attack-container")
 
 	-- Images
-	local acquiredImages = getImageGallery(chara, attack)
+	local acquiredImages = utils.getImageGallery(chara, attack)
 	local tabberData
 	if acquiredImages ~= '<div class="attack-gallery-image"></div>' then
 		tabberData = tabber({
 			label1 = "Images",
-			content1 = getImageGallery(chara, attack),
+			content1 = utils.getImageGallery(chara, attack),
 			-- label2 = "Hitboxes",
 			-- content2 = getHitboxGallery(chara, attack),
 		})

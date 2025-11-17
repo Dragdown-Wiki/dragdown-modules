@@ -34,7 +34,7 @@ end
 function p.main(frame)
 	local args = require("Arguments").getArgs(frame)
 	local host = args['host'] or mw.title.getCurrentTitle().basePageTitle.subpageText
-	local opp = args['mu']
+	local opp = args['mu'] or "Knuckles"
 	
 	local box = mw.html.create("div"):addClass("mu-box")
 	

@@ -1,185 +1,13 @@
+---@diagnostic disable: lowercase-global
 local p = {}
 local mArguments
 local cargo = mw.ext.cargo
-local cache = {}
 
 local tabber = require("Tabber").renderTabber
-local splitString = require("SplitStringToTable").splitStringIntoTable
-local list = require("List").makeList
 local GetImagesWikitext = require("GetImagesWikitext")
+local mysplit           = require("mysplit")
 
-local function tooltip(text, hover)
-	local n = mw.html.create("span"):addClass("tooltip")
-	n:wikitext(text):node(mw.html.create("span"):addClass("tooltiptext"):wikitext(hover):done()):done()
-	return tostring(n)
-end
-
-local function dump(o)
-	if type(o) == "table" then
-		local s = "{ "
-		for k, v in pairs(o) do
-			if type(k) ~= "number" then
-				k = '"' .. k .. '"'
-			end
-			s = s .. "[" .. k .. "] = " .. dump(v) .. ","
-		end
-		return s .. "} "
-	else
-		return tostring(o)
-	end
-end
-
-local function firstToUpper(str)
-	if str ~= nil then
-		return (str:gsub("^%l", string.upper))
-	else
-		return str
-	end
-end
-local cargo = mw.ext.cargo
-local tables = "PPlus_CharacterData"
-local fields = "chara, Weight"
-local args = { orderBy = "Weight" }
-local weightObject = cargo.query(tables, fields, args)
-
-local function readModes(chara, attack)
-	local tables = "PPlus_MoveMode"
-	local fields =
-		"chara, attack, attackID, mode, startup, startupNotes, totalActive, totalActiveNotes, endlag, endlagNotes, cancel, cancelNotes, landingLag, landingLagNotes, totalDuration, totalDurationNotes,iasa,autocancel,autocancelNotes,hitID,hitSubactionID,hitName,hitActive,customShieldSafety,uniqueField,frameChart, articleID, notes"
-	local args = {
-		where = 'PPlus_MoveMode.chara="' .. chara .. '" and PPlus_MoveMode.attack="' .. attack .. '"',
-		orderBy = "_ID",
-	}
-	local results = cargo.query(tables, fields, args)
-	return results
-end
-
-local function mysplit(inputstr, sep)
-	if sep == nil then
-		sep = "%s"
-	end
-	if inputstr == nil then
-		return nil
-	end
-	local t = {}
-	for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
-		table.insert(t, str)
-	end
-	return t
-end
-
-local function calcTumblePercent(bkb, kbg, weight, dmg, crouch)
-	local tumbleThreshold = 80
-	local crouchThreshold = 120
-	local realTumbleThreshold = tumbleThreshold
-	if crouch then
-		realTumbleThreshold = crouchThreshold
-	end
-
-	if kbg == 0 then
-		if bkb > realTumbleThreshold then
-			return 0
-		else
-			return "N/A"
-		end
-	else
-		return math.max(
-			0,
-			math.ceil(
-				((((realTumbleThreshold - bkb) / (kbg / 100)) - 18) / ((200 / (weight + 100)) * 1.4)) / (dmg * 0.05 + 0.1)
-			) - dmg
-		)
-	end
-end
-
-local function calcWDSKWeight(wdsk, bkb, kbg, crouch)
-	local tumbleThreshold = 80
-	local crouchThreshold = 120
-	local realTumbleThreshold = tumbleThreshold
-	if crouch then
-		realTumbleThreshold = crouchThreshold
-	end
-	
-	if kbg == 0 then
-		return math.floor((1 / ((80 - bkb)/ -18)) * ((((wdsk * 10 * 0.05) + 1) * 1.4)) * 200 - 100)
-	else
-		return math.floor((1 / ((80 - bkb)/(kbg * 0.01) - 18)) * ((((wdsk * 10 * 0.05) + 1) * 1.4)) * 200 - 100)
-	end
-end
-
-local function calcSimpleTumble(result)
-	local d = tonumber(result.damage)
-	local bkb = tonumber(result.bkb)
-	local kbg = tonumber(result.kbg)
-	local wdsk = tonumber(result.wdsk)
-
-	local minWeight = 64 -- Puff Weight
-	local maxWeight = 113 -- Bowser Weight
-
-	if wdsk ~= 0 then
-		if calcWDSKWeight(wdsk, bkb, kbg, false) < minWeight then
-			return "Never"
-		else 
-			return "Weight: " .. calcWDSKWeight(wdsk, bkb, kbg, false)	
-		end
-		
-	elseif calcTumblePercent(bkb, kbg, minWeight, d, false) == "N/A" then
-		return "N/A"
-	elseif calcTumblePercent(bkb, kbg, minWeight, d, false) == calcTumblePercent(bkb, kbg, maxWeight, d, false) then
-		return calcTumblePercent(bkb, kbg, minWeight, d, false)
-			.. "%"
-	else
-		return calcTumblePercent(bkb, kbg, minWeight, d, false)
-			.. " - "
-			.. calcTumblePercent(bkb, kbg, maxWeight, d, false)
-			.. "%"
-	end
-end
-
-local function calcFullTumble(result, crouch, throw, name)
-	local d, bkb, kbg = result.Damage, result.BaseKnockback, tonumber(result.KnockbackScaling)
-	local angle = tonumber(result.KnockbackAngle)
-	local flipper = result.KnockbackAngleMode
-
-	local row = mw.html.create("tr")
-
-	local percents = {}
-
-	local lWeight = weightObject
-
-	if result.ForceTumble == "True" then
-		row:tag("td"):wikitext(name)
-		row:tag("td"):wikitext("This hit forces tumble."):attr("colspan", #lWeight + 1)
-		row:done()
-		return tostring(row)
-	end
-
-	if result.bIgnoresWeight == "True" or throw or kbg == 0 then
-		row:tag("td"):wikitext(name)
-		row:tag("td")
-			:wikitext(calcTumblePercent(bkb, kbg, 100, d, crouch, angle, flipper) .. "%")
-			:attr("colspan", #lWeight + 1)
-		row:done()
-		return tostring(row)
-	else
-		for k, v in ipairs(lWeight) do
-			table.insert(percents, (calcTumblePercent(bkb, kbg, v.Weight, d, crouch, angle, flipper)))
-		end
-		-- Armoured Etalus Weight
-		table.insert(percents, (calcTumblePercent(bkb, kbg, 150, d, crouch, angle, flipper)))
-	end
-	row:tag("td"):wikitext(name)
-	row:tag("td"):wikitext(percents[1] .. " - " .. percents[#percents - 1] .. "%")
-	for k, v in ipairs(percents) do
-		if v ~= "N/A" then
-			row:tag("td"):wikitext(v .. "%")
-		else
-			row:tag("td"):wikitext(v)
-		end
-	end
-	row:done()
-	return tostring(row)
-end
+local tooltip = require("tooltip")
 
 local function drawFrame(frames, frameType)
 	local output = ""
@@ -192,7 +20,7 @@ local function drawFrame(frames, frameType)
 	return output
 end
 
-local function drawFrameData(s1, s2, s3, s4)
+function p.drawFrameData(s1, s2, s3, s4)
 	currentFrame = 0
 
 	html = mw.html.create("div")
@@ -223,12 +51,20 @@ local function drawFrameData(s1, s2, s3, s4)
 	first_active_frame = totalStartup + 1
 	counter = 1
 	if s2 and s2 ~= "N/A" then
+		-- s2 = "38...1-4"
 		csplit = mysplit(s2, ",")
 		ATL = #csplit
 		for i = 1, ATL do
 			hyphen = #(mysplit(csplit[i], "-"))
 			startFrame = mysplit(csplit[i], "-")[1]
+
+			if startFrame:find("...") then
+				startFrame = mysplit(startFrame, "...")[1]
+			end
+
 			endFrame = mysplit(csplit[i], "-")[hyphen]
+
+			-- error: comparing number with nil
 			if tonumber(startFrame) > first_active_frame + 1 then
 				active[counter] = -1 * (tonumber(startFrame) - first_active_frame - 1)
 				counter = counter + 1
@@ -348,16 +184,7 @@ local function calcShieldSafety(result, mode, active, custom)
 	end
 	
 	if tonumber(mode.totalDuration) then
-		local stun = math.floor(result.damage * 0.447 + 1.99)
-		
-		if active:sub(-1, -1) == "+" and tonumber(active:sub(1, #active-1)) and tonumber(mode.totalActive) then  -- PROJECTILES
-			local endlag = mode.totalDuration - tonumber(active:sub(1, #active-1))
-			if mode.iasa then
-				endlag = mode.iasa - tonumber(active:sub(1, #active-1))
-			end
-			local hitLag = math.floor(result.damage * 0.3333334 + 3)
-			return string.format("At worst: %+d", hitLag + stun - endlag)
-		end
+		local stun = result.BlockStun
 		
 		local active1 = mysplit(active, ", ")
 		active1 = active1[#active1]
@@ -371,9 +198,6 @@ local function calcShieldSafety(result, mode, active, custom)
 
 		if mode.landingLag ~= nil then
 			local realLandingLag = mode.landingLag
-			if tonumber(mode.landingLag) == nil and  mode.landingLag:sub(-1, -1) == "L" then
-				realLandingLag = math.floor(mode.landingLag:sub(0, -2) / 2)
-			end
 
 			return string.format("%+d", stun - realLandingLag)
 
@@ -389,7 +213,9 @@ local function calcShieldSafety(result, mode, active, custom)
 	end
 end
 
-local function makeAngleDisplay(angle, flipper)
+function p.makeAngleDisplay(angle, flipper)
+	local game = mw.title.getCurrentTitle().rootText
+
 	angle = tonumber(angle)
 	local angleColor = mw.html.create("span"):wikitext(angle)
 	if angle > 360 then
@@ -415,14 +241,14 @@ local function makeAngleDisplay(angle, flipper)
 			:css("top", "0")
 			:css("left", "0")
 			:css("transform-origin", "center center")
-			:wikitext("[[File:PPlus_AngleComplex_BG.svg|256px|link=]]")
+			:wikitext("[[File:"..game.."_AngleComplex_BG.svg|256px|link=]]")
 			:done()
 			:tag("div")
 			:css("z-index", "1")
 			:css("position", "relative")
 			:css("top", "0")
 			:css("left", "0")
-			:wikitext("[[File:PPlus_AngleComplex_MG.svg|256px|link=]]")
+			:wikitext("[[File:"..game.."_AngleComplex_MG.svg|256px|link=]]")
 			:done()
 			:tag("div")
 			:css("transform", "rotate(-" .. angle .. "deg)")
@@ -431,11 +257,11 @@ local function makeAngleDisplay(angle, flipper)
 			:css("top", "0")
 			:css("left", "0")
 			:css("transform-origin", "center center")
-			:wikitext("[[File:PPlus_AngleComplex_FG.svg|256px|link=]]")
+			:wikitext("[[File:"..game.."_AngleComplex_FG.svg|256px|link=]]")
 			:done()
 		div1:wikitext("Angle Flipper: " .. flipper)
 		div1:done()
-		display:node(div1):wikitext("[[File:PPlus_AngleComplex_Key.svg|256px|link=]]")
+		display:node(div1):wikitext("[[File:"..game.."_AngleComplex_Key.svg|256px|link=]]")
 		display:done()
 	else
 		div1:wikitext("Angle Flipper: " .. flipper)
@@ -446,7 +272,9 @@ local function makeAngleDisplay(angle, flipper)
 	return tostring(tooltip(tostring(angleColor), tostring(display)))
 end
 
-local function showHitUniques(hasArticle, result, unique)
+function p.showHitUniques(hasArticle, result, unique)
+	local game = mw.title.getCurrentTitle().rootText
+
 	local listOfUniques = {}
 
 	if unique ~= nil then
@@ -456,159 +284,59 @@ local function showHitUniques(hasArticle, result, unique)
 		end
 	end
 
-	if tonumber(result.shield_damage)  ~= 0 then
-		table.insert(listOfUniques, "Shield Damage: " .. result.shield_damage)
-	end
+    if game ~= "AFQM" then
+        if tonumber(result.DirectionalInfluenceMultiplier ) ~= 1 then
+            table.insert(listOfUniques, "DI: " .. result.DirectionalInfluenceMultiplier .. '×')
+        end
+        
+        if tonumber(result.SmashDirectionalInfluenceMultiplier ) ~= 1 then
+            table.insert(listOfUniques, "DI: " .. result.SmashDirectionalInfluenceMultiplier .. '×'  )
+        end
+        
+        if tonumber(result.HitStunMinimum ) ~= 1 then
+            table.insert(listOfUniques, "Min Hitstun: " .. result.HitStunMinimum)
+        end
+        if tonumber(result.HitStunMultiplier  ) ~= 1 then
+            table.insert(listOfUniques, "Hitstun: " .. result.HitStunMultiplier  .. '×'  )
+        end
+    end
 	
-	if tonumber(result.hitlag_mult) ~= 1 then
-		table.insert(listOfUniques, tooltip("Hitlag","Applies to only the defender.") .. ": " .. result.hitlag_mult )
-	end
-	
-	if tonumber(result.sdi_mult) ~= 1 then
-		table.insert(listOfUniques, "SDI: " .. result.sdi_mult )
-	end
-	
-	if result.hitbox_effect == "Electric" then
-		table.insert(listOfUniques, result.hitbox_effect)
-	end
-	
-	if result.ground == "False" and result.aerial ~= "False" then
-		table.insert(listOfUniques, "Airborne Only")
-	end
-	if result.ground ~= "False" and result.aerial == "False"  then
-		table.insert(listOfUniques, "Grounded Only")
-	end
-	if result.clang == "False" then
-		table.insert(listOfUniques, "Transcendent")
-	end
-	if result.can_be_shielded  == "False" then
-		table.insert(listOfUniques, "Unshieldable")
-	end
-	if result.can_be_reflected  == "True" then
-		table.insert(listOfUniques, "Reflectable")
-	end
-	if result.can_be_absorbed  == "True" then
-		table.insert(listOfUniques, "Absorbable")
-	end
-
 	if #listOfUniques <= 0 then
 		return nil
 	else
 		return table.concat(listOfUniques, ", ")
 	end
-	return
-end
-
-local function getArticles(articleData)
-	local fields =
-		"ArticleName,bIsProjectile,bRotateWithVelocity,bInheritOwnerChargeValue,bIsAttachedToOwner,ParryReaction,HasHitReaction,GotHitReaction,bCanBeHitByOwner,bCanDetectOwner,GroundCollisionResponse,WallCollisionResponse,CeilingCollisionResponse,ShouldGetOutOfGroundOnSpawn"
-
-	local hitRow = mw.html.create("tr")
-	for k, v in ipairs(mysplit(fields, ",")) do
-		local assignedValue = firstToUpper(articleData[v])
-		if assignedValue == nil then
-			assignedValue = "N/A"
-		end
-		local cell = mw.html.create("td"):wikitext(assignedValue):done()
-		hitRow:node(cell)
-	end
-
-	hitRow:done()
-	return hitRow
 end
 
 local function getHits(hasArticle, result, mode, hitData)
 	--chara, attackID, hitID, hitMoveID, hitName, hitActive, customShieldSafety, uniques
-	local hitRow = mw.html.create("tr")
+	local hitRow = mw.html.create("tr"):addClass("hit-row")
 	if(tonumber(hitData.name)) then
-		hitRow:tag("td"):wikitext(result.seq_hit_set)
+		hitRow:tag("td"):wikitext(result.hitName)
 	else
 		hitRow:tag("td"):wikitext(hitData.name)
 	end
-	hitRow:tag("td"):wikitext(result.damage .. "%")
+	hitRow:tag("td"):wikitext(result.Damage .. "%")
 		:tag("td"):wikitext(hitData.active)
-		:tag("td"):wikitext(result.bkb)
-		:tag("td"):wikitext(result.kbg)
-		:tag("td"):wikitext(result.wdsk)
-		:tag("td"):wikitext(makeAngleDisplay(result.trajectory, result.angle_flipping))
-		:tag("td"):wikitext(calcSimpleTumble(result))
+		:tag("td"):wikitext(result.BaseKnockback )
+		:tag("td"):wikitext(result.KnockbackGain )
+		:tag("td"):wikitext(result.FixedKnockback )
+		:tag("td"):wikitext(p.makeAngleDisplay(result.KnockbackAngle , result.SpecialAngle ))
 		-- :tag("td"):wikitext("T")
 		:tag("td"):wikitext(calcShieldSafety(result, mode, hitData.active, hitData.shield))
 		:done()
 	return hitRow
 end
 
-local function getThrows(result, mode, hitData)
-	local hitRow = mw.html.create("tr")
-	hitRow
-		:tag("td")
-		:wikitext(hitData.name)
-		:tag("td")
-		:wikitext(result.Damage .. "%")
-		:tag("td")
-		:wikitext(hitData.active)
-		:tag("td")
-		:wikitext(string.format("%.1f", result.BaseKnockback) .. " + " .. result.KnockbackScaling)
-		:tag("td")
-		:wikitext(makeAngleDisplay(result.KnockbackAngle))
-		:tag("td")
-		:wikitext(calcSimpleTumble(result))
-		:tag("td")
-		:wikitext("N/A")
-		:tag("td")
-		:wikitext(showThrowUniques(result, hitData.unique))
-		:done()
-	return hitRow
-end
-
-local function getAdvHits(result, mode, hitData, articleData)
+function p.getAdvHits(result, mode, hitData, articleData)
 	--chara, attackID, hitID, hitMoveID, hitName, hitActive, customShieldSafety, uniques
 
-	local columns = "name,hitlag_mult,shield_stun,shield_damage,shield_kb,shield_hitlag,sdi_mult,hitbox_effect,ground,aerial,clang,angle_flipping,hits_fighters,waddle_dee,sse,saturn,wall_hit,stage_misc_hit,bomb,can_be_shielded,can_be_reflected,can_be_absorbed,remain_grabbed,enabled,ignore_invincibility,freeze_frame_disable,flinchless"
+	local columns = "hitName,SpecialAngle,DirectionalInfluenceMultiplier,SmashDirectionalInfluenceMultiplier,HitStunMinimum,HitStunMultiplier,HitlagBaseOnBlock,HitlagBaseOnHit,InstigatorAdvantageOnBlock,InstigatorAdvantageOnHit,BlockStun,BlockPush,BlockDamage,Priority,PushBackInstigatorOnHit,KnockbackIgnoreDownState,Aerial,Flinchless,ForceSpinOut,Reversible,Unblockable,UntechableIfGrounded,CannotRebound,CanRedirectProjectiles,CanReflectProjectiles,PreventSlimeBurst,SlimeMultiplier,InstigatorPushbackVelocity,UniqueNotes"
 
 	local hitRow = mw.html.create("tr")
 	for k, v in ipairs(mysplit(columns, ",")) do
 		local assignedValue = ""
-		if v == "hitlag_mult" then
-			assignedValue = math.floor(result.damage * 0.3333334 + 3)
-			if hitbox_effect == 'Electric' then
-				assignedValue = math.floor(assignedValue * 1.5)	
-			end
-			assignedValue = math.floor(assignedValue * result.hitlag_mult)
-		elseif v == "sdi_mult" then
-			assignedValue = result.sdi_mult .. "×"
-		elseif v == "shield_stun" then
-			assignedValue = math.floor(result.damage * 0.447 + 1.99)
-		elseif v == "shield_damage" then
-			assignedValue = result.damage
-		elseif v == "shield_kb" then
-			assignedValue = "Shield KB?"
-		elseif v == "name" then
-			assignedValue = hitData.name
-		else
-			assignedValue = result[v]
-		end
-		local cell = mw.html.create("td"):wikitext(assignedValue):done()
-		hitRow:node(cell)
-	end
-
-	hitRow:done()
-	return hitRow
-end
-
-local function getAdvThrows(result, mode, hitData)
-	local fields = "HitstunMultiplier,bTechable,ForceTumble,HitstunAnimationStateOverride,ReleaseOffset"
-
-	local hitRow = mw.html.create("tr")
-	hitRow:node(mw.html.create("td"):wikitext(hitData.name))
-
-	for k, v in ipairs(mysplit(fields, ",")) do
-		local assignedValue = ""
-		if v == "HitstunMultiplier" then
-			assignedValue = result[v] .. "×"
-		else
-			assignedValue = result[v]
-		end
+		assignedValue = result[v]
 		local cell = mw.html.create("td"):wikitext(assignedValue):done()
 		hitRow:node(cell)
 	end
@@ -671,12 +399,22 @@ local function createMode(hasArticle, mode, motherhits, hitresults, throwresults
 	columnValues["startup"] = "N/A"
 	if mode.startup == nil then
 		if mode.totalActive ~= nil then
-			local processed_active = mode.totalActive
+			local processed_active = mode.totalActive -- "38...1-4"
 			if string.find(processed_active, "+") then
 				processed_active = mysplit(processed_active, "+")[1]
 			end
 			columnValues["startup"] = mysplit(mysplit(processed_active, ",")[1], "-")[1]
-			mode.startup = mysplit(mysplit(processed_active, ",")[1], "-")[1] - 1
+
+			local firstSplit = mysplit(processed_active, ",") -- ["38...1-4"]
+			local firstAccess = firstSplit[1] -- "38...1-4"
+			local secondSplit = mysplit(firstAccess, "-") -- ["38...1", "4"]
+			local secondAccess = secondSplit[1] -- "38...1"
+
+			if secondAccess:find("...") then
+				mode.startup = mysplit(secondAccess, "...")[1] - 1
+			else
+				mode.startup = secondAccess - 1
+			end
 		else
 			columnValues["startup"] = "N/A"
 		end
@@ -727,8 +465,8 @@ local function createMode(hasArticle, mode, motherhits, hitresults, throwresults
 				columnValues["endlag"] = mode.iasa - 1 - catch2[#catch2]
 				mode.endlag = mode.iasa - 1 - catch2[#catch2]
 			else
-				columnValues["endlag"] = mode.totalDuration - 1 - catch2[#catch2]
-				mode.endlag = mode.totalDuration - 1 - catch2[#catch2]
+				columnValues["endlag"] = mode.totalDuration - catch2[#catch2]
+				mode.endlag = mode.totalDuration - catch2[#catch2]
 			end
 		else
 			columnValues["endlag"] = "N/A"
@@ -854,7 +592,7 @@ local function createMode(hasArticle, mode, motherhits, hitresults, throwresults
 			frameChart:wikitext(mode.frameChart):done()
 		end
 	else
-		frameChart:wikitext(drawFrameData(mode.startup,mode.totalActive,mode.endlag,mode.landingLag)):done()
+		frameChart:wikitext(p.drawFrameData(mode.startup,mode.totalActive,mode.endlag,mode.landingLag)):done()
 	end
 
 	local numbersPanel = mw.html.create("div"):addClass("numbers-panel"):css("overflow-x","auto"):node(t):node(frameChart)
@@ -881,10 +619,6 @@ local function createMode(hasArticle, mode, motherhits, hitresults, throwresults
 			),
 			tooltip("Angle", "The angle at which the move sends the target."),
 			tooltip(
-				"Tumble",
-				"The pre-hit percent that this hit tumbles and knocks down at, from the lightest to the heaviest character. N/A means that the hit can never tumble.<br>If the move is weight dependent set knockback, a maximum weight for tumbling will be displayed instead. Characters with this weight or lower will enter tumble."
-			),
-			tooltip(
 				"Shield Safety",
 				"The frame advantage after a move connects on shield. If a move ends prematurely with landing lag like an aerial, the shield safety assumes that the character lands immediately after performing the hit."
 			),
@@ -897,16 +631,16 @@ local function createMode(hasArticle, mode, motherhits, hitresults, throwresults
 		local hitsWindow = mw.html.create("table"):addClass("wikitable hits-window"):node(headersHitRow)
 
 		if hitresults ~= nil then
-			for k, v in ipairs(hitresults) do
+			for k, v in pairs(hitresults) do
 				hitsWindow:node(
 					getHits(
 						hasArticle,
 						hitresults[k],
 						mode,
-						motherhits[hitresults[k].attack .. "_" .. hitresults[k].hit_label]
+						motherhits[k]
 					)
 				)
-				local uniqueRow = showHitUniques(hasArticle, hitresults[k], motherhits[hitresults[k].attack .. "_" .. hitresults[k].hit_label].unique)
+				local uniqueRow = p.showHitUniques(hasArticle, hitresults[k], motherhits[k].unique)
 				if uniqueRow then
 					hitsWindow:tag("tr"):addClass("unique-row"):tag("td"):attr("colspan", 8):css("text-align", "left"):wikitext("'''Unique''': " .. uniqueRow):done()
 				end
@@ -938,33 +672,35 @@ local function createAdvMode(mode, articleList, motherhits, hitresults, throwres
 		local c1 = mw.html.create("div"):addClass("mw-collapsible-content")
 
 		local columnHeaders = {
-			"Hit / Hitbox ",
-			"Hitlag",
-			"Shield Stun",
-			"Shield Damage",
-			"Shield Knockback",
-			"Shield Hitlag",
+			"Name",
+			"Special Angle",
+			"DI Multiplier",
 			"SDI Multiplier",
-			"Hitbox Effect",
-			"Hits Grounded?",
-			"Hits Airborne?",
-			"Clanks?",
-			"Angle Flipping",
-			"Hits Characters",
-			tooltip("Hits Dees", "Includes Waddle Dees, Waddle Doos, and Pikmin."),
-			tooltip("Hits SSE Enemies", "Subspace Emissary. Irrelevant to competitive play."),
-			tooltip("Hits Saturn", "Hits Mr Saturn, Snake C4, and Grenade."),
-			"Hits Wall, Floor, Ceilings",
-			"Hits Other Stage Elements",
-			tooltip("Hits Bombs", "Hits Link and Toon Link's bomb, as well as Bo-Bombs."),
-			"Can Be Shielded?",
-			"Can Be Reflected?",
-			"Can Be Absorbed?",
-			"Remain Grabbed?",
-			"Enabled?",
-			"Ignores Invincibility?",
-			"Disables Hitlag?",
-			"Flinchless?",
+			"HitStun Minimum",
+			"HitStun Multiplier",
+			"Hitlag Base On Block",
+			"Hitlag Base On Hit",
+			"Instigator Advantage On Block",
+			"Instigator Advantage On Hit",
+			"Block Stun",
+			"Block Push",
+			"Block Damage",
+			"Priority",
+			"PushBack Instigator On Hit",
+			"Knockback Ignore Down State",
+			"Aerial",
+			"Flinchless",
+			"Force Spin Out",
+			"Reversible",
+			"Unblockable",
+			"Untechable If Grounded",
+			"Cannot Rebound",
+			"Can Redirect Projectiles",
+			"Can Reflect Projectiles",
+			"Prevent Slime Burst",
+			"Slime Multiplier",
+			"Instigator Pushback Velocity",
+			"Unique Notes",
 		}
 
 		local headersRow = mw.html.create("tr"):addClass("adv-hits-list-header")
@@ -976,7 +712,7 @@ local function createAdvMode(mode, articleList, motherhits, hitresults, throwres
 		local hitsWindow = mw.html.create("table"):addClass("hits-window wikitable"):node(headersRow)
 
 		for k, v in ipairs(hitresults) do
-			hitsWindow:node(getAdvHits(hitresults[k], mode, motherhits[hitresults[k].attack .. "_" .. hitresults[k].hit_label], articleList))
+			hitsWindow:node(p.getAdvHits(hitresults[k], mode, motherhits[hitresults[k]], articleList))
 			-- tumbleTable:node(calcFullTumble(hitresults[k], false, false, motherhits[hitresults[k].moveID .. hitresults[k].nameID].name))
 			-- CCTable:node(calcFullTumble(hitresults[k], true, false, motherhits[hitresults[k].moveID .. hitresults[k].nameID].name))
 		end
@@ -991,14 +727,15 @@ local function createAdvMode(mode, articleList, motherhits, hitresults, throwres
 	return tostring(finalreturn)
 end
 
-local function getImageGallery(chara, attack)
-	local tables = "PPlus_MoveMode, PPlus_MoveMode__image, PPlus_MoveMode__caption"
+function p.getImageGallery(chara, attack)
+	local game = mw.title.getCurrentTitle().rootText
+	local tables = game.."_MoveMode, "..game.."_MoveMode__image, "..game.."_MoveMode__caption"
 	local fields = "image, caption"
 	local args = {
-		join = "PPlus_MoveMode__image._rowID=PPlus_MoveMode._ID, PPlus_MoveMode__image._rowID=PPlus_MoveMode__caption._rowID, PPlus_MoveMode__image._position=PPlus_MoveMode__caption._position",
-		where = 'PPlus_MoveMode.chara="' .. chara .. '" and PPlus_MoveMode.attack="' .. attack .. '"',
+		join = game.."_MoveMode__image._rowID="..game.."_MoveMode._ID, "..game.."_MoveMode__image._rowID="..game.."_MoveMode__caption._rowID, "..game.."_MoveMode__image._position="..game.."_MoveMode__caption._position",
+		where = ''..game..'_MoveMode.chara="' .. chara .. '" and '..game..'_MoveMode.attack="' .. attack .. '"',
 		orderBy = "_ID",
-		groupBy = "PPlus_MoveMode__image._value",
+		groupBy = game.."_MoveMode__image._value",
 	}
 	local results = cargo.query(tables, fields, args)
 
@@ -1027,19 +764,22 @@ local function getHitboxGallery(chara, attack)
 	return "Hitboxes are currently unavailable."
 end
 
-local function getCardHTML(chara, attack, desc, advDesc)
+--- @param readModes function
+function p.getCardHTML(chara, attack, desc, advDesc, readModes)
 	-- Lazy Load automated frame chart generator
 	-- local autoChart = require('FrameChart').autoChart
 	-- Outer Container of the card
 	local card = mw.html.create("div"):addClass("attack-container")
 
+	local game = mw.title.getCurrentTitle().rootText
+
 	-- Images
-	local acquiredImages = getImageGallery(chara, attack)
+	local acquiredImages = p.getImageGallery(chara, attack)
 	local tabberData
 	if acquiredImages ~= '<div class="attack-gallery-image"></div>' then
 		tabberData = tabber({
 			label1 = "Images",
-			content1 = getImageGallery(chara, attack),
+			content1 = p.getImageGallery(chara, attack),
 			-- label2 = "Hitboxes",
 			-- content2 = getHitboxGallery(chara, attack),
 		})
@@ -1047,9 +787,9 @@ local function getCardHTML(chara, attack, desc, advDesc)
 		local container = mw.html.create("div"):addClass("attack-gallery-image")
 		container:wikitext(
 			table.concat(
-				getImagesWikitext({
+				GetImagesWikitext({
 					{
-						file = "PPlus_" .. chara .. "_" .. attack .. "_0.png",
+						file = game.. "_" .. chara .. "_" .. attack .. "_0.png",
 						caption = "NOTE: This is an incomplete card, with data modes planning to be uploaded in the future.",
 					},
 				})
@@ -1086,94 +826,70 @@ local function getCardHTML(chara, attack, desc, advDesc)
 	nerdSection:node(mw.html.create("div"):wikitext(advDesc))
 
 	local tableData = readModes(chara, attack)
+	local queues = {}
+	for i in pairs(tableData) do
+		local mode = tableData[i]
+		local hits = {}
+		local hit_results = nil
+		local throw_results = nil
+		if mode.hitID ~= nil then
+			local idList = mysplit(mode.hitID, ";")
+			local hitMoves = mysplit(mode.hitMoveID, ";")
+			local names = mysplit(mode.hitName, ";")
+			local actives = mysplit(mode.hitActive, ";")
+			local shieldSafetyList = mysplit(mode.customShieldSafety, ";")
+			local uniquesList = mysplit(mode.uniqueField, ";")
+			for k in ipairs(idList) do
+				local attack = mode.attackID
+				if hitMoves ~= nil then
+					attack = hitMoves[k]
+				end
+				hits[k] = {}
+				hits[k]["hitID"] = idList[k]
+				hits[k]["move"] = attack
+				hits[k]["name"] = idList[k]
+				if names ~= nil then
+					hits[k]["name"] = names[k]
+				end
+				hits[k]["active"] = actives[k]
+				hits[k]["shield"] = nil
+				if shieldSafetyList ~= nil then
+					hits[k]["shield"] = shieldSafetyList[k]
+				end
+				hits[k]["unique"] = nil
+				if uniquesList ~= nil and uniquesList[k] ~= "-" then
+					hits[k]["unique"] = uniquesList[k]
+				end
+			end
+
+			local tables = game.."_HitData"
+			local fields = "chara,hitName,hitID,Damage,BaseKnockback,KnockbackGain,FixedKnockback,KnockbackAngle,SpecialAngle,DirectionalInfluenceMultiplier,SmashDirectionalInfluenceMultiplier,HitStunMinimum,HitStunMultiplier,HitlagBaseOnBlock,HitlagBaseOnHit,InstigatorAdvantageOnBlock,InstigatorAdvantageOnHit,BlockStun,BlockPush,BlockDamage,Priority,PushBackInstigatorOnHit,KnockbackIgnoreDownState,Aerial,Flinchless,ForceSpinOut,Reversible,Unblockable,UntechableIfGrounded,CannotRebound,CanRedirectProjectiles,CanReflectProjectiles,PreventSlimeBurst,SlimeMultiplier,InstigatorPushbackVelocity,UniqueNotes"
+			local whereField = 'chara="' .. mode.chara .. '" and ('
+			local whereList = {}
+			for k, v in pairs(hits) do
+				table.insert(whereList, '(hitID = "' .. v["hitID"] .. '")')
+			end
+			local whereField = whereField .. table.concat(whereList, " or ") .. ")"
+			local args = { where = whereField, orderBy = "_ID" }
+			hit_results = cargo.query(tables, fields, args)
+			-- hitsWindow:wikitext(dump(args))
+
+			local whereList = {}
+			for k, v in pairs(hits) do
+				table.insert(whereList, '(attack = "' .. v["move"] .. '")')
+			end
+		end
+		queues[mode] = {mode = mode, hits = hits, hit_results = hit_results, articles = articles}
+	end
 	if #tableData > 1 then
 		local object = {}
 		local advObject = {}
 		for i in pairs(tableData) do
-			local mode = tableData[i]
-			local hits = {}
-			local hit_results = nil
-			local throw_results = nil
-			if mode.hitID ~= nil then
-				local idList = mysplit(mode.hitID, ";")
-				local hitMoves = mysplit(mode.hitSubactionID, ";")
-				local names = mysplit(mode.hitName, ";")
-				local actives = mysplit(mode.hitActive, ";")
-				local shieldSafetyList = mysplit(mode.customShieldSafety, ";")
-				local uniquesList = mysplit(mode.uniqueField, ";")
-				for k in ipairs(idList) do
-					local attack = mode.attackID
-					if hitMoves ~= nil then
-						attack = hitMoves[k]
-					end
-					local v = idList[k]
-					hits[attack .. "_" .. v] = {}
-					hits[attack .. "_" .. v]["hitID"] = idList[k]
-					hits[attack .. "_" .. v]["move"] = attack
-					hits[attack .. "_" .. v]["name"] = idList[k]
-					if names ~= nil then
-						hits[attack .. "_" .. v]["name"] = names[k]
-					end
-					hits[attack .. "_" .. v]["active"] = actives[k]
-					hits[attack .. "_" .. v]["shield"] = nil
-					if shieldSafetyList ~= nil then
-						hits[attack .. "_" .. v]["shield"] = shieldSafetyList[k]
-					end
-					hits[attack .. "_" .. v]["unique"] = nil
-					if uniquesList ~= nil and uniquesList[k] ~= "-" then
-						hits[attack .. "_" .. v]["unique"] = uniquesList[k]
-					end
-				end
-
-				local tables = "PPlus_HitData"
-				local fields =
-					"chara,attack,hit_label,seq_hit_set,damage,trajectory,wdsk,kbg,bkb,shield_damage,hitlag_mult,sdi_mult,hitbox_effect,sound,ground,aerial,clang,special_hit,angle_flipping,hits_fighters,waddle_dee,sse,saturn,wall_hit,stage_misc_hit,bomb,can_be_shielded,can_be_reflected,can_be_absorbed,remain_grabbed,enabled,ignore_invincibility,freeze_frame_disable,flinchless"
-
-				local whereField = 'chara="' .. mode.chara .. '" and ('
-				local whereList = {}
-				for k, v in pairs(hits) do
-					table.insert(whereList, '(attack = "' .. v["move"] .. '" and hit_label = "' .. v["hitID"] .. '")')
-				end
-				local whereField = whereField .. table.concat(whereList, " or ") .. ")"
-				local args = { where = whereField, orderBy = "_ID" }
-				hit_results = cargo.query(tables, fields, args)
-				-- hitsWindow:wikitext(dump(args))
-
-				local whereList = {}
-				for k, v in pairs(hits) do
-					table.insert(whereList, '(attack = "' .. v["move"] .. '")')
-				end
-				if #whereList > 0 then
-					local tables = "PPlus_ThrowData"
-					local fields =
-						"chara, attack, sequence_num, throw_use, hitbox_effect, damage, trajectory, wdsk, kbg, bkb, grab_target, throw_i_frames"
-
-					local whereField = 'chara="' .. mode.chara .. '" and ('
-					whereField = whereField .. table.concat(whereList, " or ") .. ")"
-					local args = { where = whereField, orderBy = "_ID" }
-					throw_results = cargo.query(tables, fields, args)
-				end
-
-				-- if mode.articleID ~= nil then
-				-- 	local tables = "PPlus_Articles"
-				-- 	local fields =
-				-- 		"chara,moveID,ArticleName,bIsProjectile,bRotateWithVelocity,bInheritOwnerChargeValue,bIsAttachedToOwner,ParryReaction,HasHitReaction,GotHitReaction,bCanBeHitByOwner,bCanDetectOwner,GroundCollisionResponse,WallCollisionResponse,CeilingCollisionResponse,ShouldGetOutOfGroundOnSpawn"
-
-				-- 	local whereField = 'chara="' .. chara .. '" and ('
-				-- 	local whereList = {}
-				-- 	for _, v in pairs(mysplit(mode.articleID, ";")) do
-				-- 		table.insert(whereList, '(moveID = "' .. v .. '")')
-				-- 	end
-				-- 	local whereField = whereField .. table.concat(whereList, " or ") .. ")"
-				-- 	local args = { where = whereField, orderBy = "ArticleName" }
-				-- 	articleList = cargo.query(tables, fields, args)
-				-- end
-			end
-			object["label" .. i] = tableData[i].mode
-			object["content" .. i] = createMode(mode.articleID ~= nil, tableData[i], hits, hit_results, throw_results)
+			object["label" .. i] = queues[tableData[i]].mode
+			object["content" .. i] = createMode(false, queues[tableData[i]].mode, queues[tableData[i]].hits, queues[tableData[i]].hit_results, queues[tableData[i]].throw_results)
 			-- object["content" .. i] = createMode(tableData[i], hits, hit_results, throw_results)
 			advObject["label" .. i] = tableData[i].mode
-			advObject["content" .. i] = createAdvMode(tableData[i], articleList, hits, hit_results, throw_results)
+			advObject["content" .. i] = createAdvMode(queues[tableData[i]].mode, queues[tableData[i]].articles, queues[tableData[i]].hits, queues[tableData[i]].hit_results, queues[tableData[i]].throw_results)
 		end
 		local t = tabber(object)
 		local t2 = tabber(advObject)
@@ -1181,90 +897,11 @@ local function getCardHTML(chara, attack, desc, advDesc)
 		nerdSection:node(t2):addClass("move-mode-tabs"):done()
 		-- There should be a tabber element both in the frame window and also the advanced element one
 	else
-		local mode = tableData[1]
-		local hits = {}
-		local hit_results = nil
-		local throw_results = nil
-		local articleList = nil
-		if mode then
-			if mode.hitID ~= nil then
-				local idList = mysplit(mode.hitID, ";")
-				local hitMoves = mysplit(mode.hitSubactionID, ";")
-				local names = mysplit(mode.hitName, ";")
-				local actives = mysplit(mode.hitActive, ";")
-				local shieldSafetyList = mysplit(mode.customShieldSafety, ";")
-				local uniquesList = mysplit(mode.uniqueField, ";")
-				for k in ipairs(idList) do
-					local attack = mode.attackID
-					if hitMoves ~= nil then
-						attack = hitMoves[k]
-					end
-					local v = idList[k]
-					hits[attack .. "_" .. v] = {}
-					hits[attack .. "_" .. v]["hitID"] = idList[k]
-					hits[attack .. "_" .. v]["move"] = attack
-					hits[attack .. "_" .. v]["name"] = idList[k]
-					if names ~= nil then
-						hits[attack .. "_" .. v]["name"] = names[k]
-					end
-					hits[attack .. "_" .. v]["active"] = actives[k]
-					hits[attack .. "_" .. v]["shield"] = nil
-					if shieldSafetyList ~= nil then
-						hits[attack .. "_" .. v]["shield"] = shieldSafetyList[k]
-					end
-					hits[attack .. "_" .. v]["unique"] = nil
-					if uniquesList ~= nil and uniquesList[k] ~= "-" then
-						hits[attack .. "_" .. v]["unique"] = uniquesList[k]
-					end
-				end
-
-				local tables = "PPlus_HitData"
-				local fields =
-					"chara,attack,hit_label,seq_hit_set,damage,trajectory,wdsk,kbg,bkb,shield_damage,hitlag_mult,sdi_mult,hitbox_effect,sound,ground,aerial,clang,special_hit,angle_flipping,hits_fighters,waddle_dee,sse,saturn,wall_hit,stage_misc_hit,bomb,can_be_shielded,can_be_reflected,can_be_absorbed,remain_grabbed,enabled,ignore_invincibility,freeze_frame_disable,flinchless"
-
-				local whereField = 'chara="' .. chara .. '" and ('
-				local whereList = {}
-				for k, v in pairs(hits) do
-					table.insert(whereList, '(attack = "' .. v["move"] .. '" and hit_label = "' .. v["hitID"] .. '")')
-				end
-				local whereField = whereField .. table.concat(whereList, " or ") .. ")"
-				local args = { where = whereField, orderBy = "_ID" }
-				hit_results = cargo.query(tables, fields, args)
-
-				local tables = "PPlus_ThrowData"
-				local fields =
-					"chara, attack, sequence_num, throw_use, hitbox_effect, damage, trajectory, wdsk, kbg, bkb, grab_target, throw_i_frames"
-
-				local whereField = 'chara="' .. chara .. '" and ('
-				local whereList = {}
-				for k, v in pairs(hits) do
-					table.insert(whereList, '(attack = "' .. v["move"] .. '")')
-				end
-				local whereField = whereField .. table.concat(whereList, " or ") .. ")"
-				local args = { where = whereField, orderBy = "_ID" }
-				throw_results = cargo.query(tables, fields, args)
-
-				-- if mode.articleID ~= nil then
-				-- 	local tables = "PPlus_Articles"
-				-- 	local fields =
-				-- 		"chara,moveID,ArticleName,bIsProjectile,bRotateWithVelocity,bInheritOwnerChargeValue,bIsAttachedToOwner,ParryReaction,HasHitReaction,GotHitReaction,bCanBeHitByOwner,bCanDetectOwner,GroundCollisionResponse,WallCollisionResponse,CeilingCollisionResponse,ShouldGetOutOfGroundOnSpawn"
-
-				-- 	local whereField = 'chara="' .. chara .. '" and ('
-				-- 	local whereList = {}
-				-- 	for _, v in pairs(mysplit(mode.articleID, ";")) do
-				-- 		table.insert(whereList, '(moveID = "' .. v .. '")')
-				-- 	end
-				-- 	local whereField = whereField .. table.concat(whereList, " or ") .. ")"
-				-- 	local args = { where = whereField, orderBy = "ArticleName" }
-				-- 	articleList = cargo.query(tables, fields, args)
-				-- end
-			end
-			-- paletteSwap:wikitext(dump())
-			paletteSwap:node(createMode(mode.articleID ~= nil, tableData[1], hits, hit_results, throw_results)):done()
-			nerdSection:node(createAdvMode(tableData[1], articleList, hits, hit_results, throw_results)):done()
+		if(queues[tableData[1]]) then
+			paletteSwap:node(createMode(false, queues[tableData[1]].mode, queues[tableData[1]].hits, queues[tableData[1]].hit_results, queues[tableData[1]].throw_results)):done()
+			nerdSection:node(createAdvMode(queues[tableData[1]].mode, queues[tableData[1]].articles, queues[tableData[1]].hits, queues[tableData[1]].hit_results, queues[tableData[1]].throw_results)):done()
 		end
 	end
-
 	--Attack Info Container
 	nerdHeader:node(nerdSection):done()
 	local content =
@@ -1272,36 +909,6 @@ local function getCardHTML(chara, attack, desc, advDesc)
 
 	card:node(imageDiv):node(content):done()
 	return tostring(card)
-end
-
-function p.main(frame)
-	mArguments = require("Arguments")
-	local args = mArguments.getArgs(frame)
-	return p._main(args)
-end
-
-function p._main(args)
-	local chara = args["chara"]
-	local attack = args["attack"]
-	local desc = args["desc"]
-	if args["desc"] == nil then
-		desc = args["description"]
-	end
-	if desc == "" or desc == nil then
-		desc =
-			"<small>''This move card is missing a move description. The following bullet points should all be one paragraph or more and be included:''\n* Brief 1-2 sentences stating the basic function and utility of the move. Ex: ''\"Excellent anti-air, combo-starter, and combo-extender. The move starts behind before sweeping to the front.\"''\n* Explaining the reward and usefulness of the move and how it functions in her gameplan. Point out non-obvious use cases when relevant.\n* Explaining the shortcomings of the move, i.e. unsafe on shield, susceptible to CC, stubby, slow, etc.\n* Explaining when and where to use the move. Can differentiate between if it's good in neutral, punish, against fastfallers, floaties, etc.\nIf there's something you want to debate leaving it in or out, err on the side of leaving it in. For more details, read [[User:Lynnifer/Brief_Style_Guide#Move_Cards|here]].\n</small>"
-	end
-	local advDesc = args["advDesc"]
-
-	if not chara then
-		chara = mw.title.getCurrentTitle().subpageText
-	end
-	local html = getCardHTML(chara, attack, desc, advDesc)
-	return tostring(html)
-		.. mw.getCurrentFrame():extensionTag({
-			name = "templatestyles",
-			args = { src = "Template:MoveCard/shared/styles.css" },
-		})
 end
 
 return p

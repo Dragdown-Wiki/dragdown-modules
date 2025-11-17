@@ -1,31 +1,13 @@
 local p = {}
 local mArguments
-local cargo = mw.ext.cargo
-local cache = {}
 
 local tabber = require("Tabber").renderTabber
-local splitString = require("SplitStringToTable").splitStringIntoTable
-local list = require("List").makeList
+local GetImagesWikitext = require("GetImagesWikitext")
 
 local function tooltip(text, hover)
 	local n = mw.html.create("span"):addClass("tooltip")
 	n:wikitext(text):node(mw.html.create("span"):addClass("tooltiptext"):wikitext(hover):done()):done()
 	return tostring(n)
-end
-
-local function dump(o)
-	if type(o) == "table" then
-		local s = "{ "
-		for k, v in pairs(o) do
-			if type(k) ~= "number" then
-				k = '"' .. k .. '"'
-			end
-			s = s .. "[" .. k .. "] = " .. dump(v) .. ","
-		end
-		return s .. "} "
-	else
-		return tostring(o)
-	end
 end
 
 local function firstToUpper(str)
@@ -65,20 +47,6 @@ local function readModes(chara, attack)
 	return results
 end
 
-local function getImagesWikitext(t)
-	local wikitextTable = {}
-	for i, data in ipairs(t) do
-		-- MediaWiki image syntax
-		-- @see https://www.mediawiki.org/wiki/Help:Images/en#Rendering_a_single_image
-		local image = string.format("[[File:%s|thumb|center|210x210px]]", data.file)
-		local caption = tostring(
-			mw.html.create("div"):addClass("gallerytext"):css("text-align", "center"):wikitext(data.caption or "")
-		)
-		table.insert(wikitextTable, image)
-		table.insert(wikitextTable, caption)
-	end
-	return wikitextTable
-end
 local function getHitboxesWikitext(t)
 	local wikitextTable = {}
 	for i, data in ipairs(t) do
@@ -1515,7 +1483,7 @@ local function getImageGallery(chara, attack)
 		end
 	end
 	local container = mw.html.create("div"):addClass("attack-gallery-image")
-	container:wikitext(table.concat(getImagesWikitext(imageCaptionPairs)))
+	container:wikitext(table.concat(GetImagesWikitext(imageCaptionPairs)))
 
 	return tostring(container)
 end

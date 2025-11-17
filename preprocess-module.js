@@ -11,7 +11,7 @@
  */
 export const preprocessModule = (luaString) => {
   const requiresPrefixedWithModule = luaString.replace(
-    /require\(['"]([^'"]+)['"]\)/g,
+    /require\(\s*['"]([^'"]+)['"]\s*\)/g,
     (match, requiredModuleName) => {
       if (
         requiredModuleName === "libraryUtil" ||

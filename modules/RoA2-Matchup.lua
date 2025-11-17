@@ -313,8 +313,10 @@ end
 
 function p.main(frame)
 	local args = require("Arguments").getArgs(frame)
-	local host = args['host'] or mw.title.getCurrentTitle().basePageTitle.subpageText
-	local opp = args['mu']
+	local titleObj = mw.title.getCurrentTitle()
+	local subpage = titleObj.basePageTitle.subpageText
+	local host = args['host'] or (titleObj.namespace == 10 and "Clairen" or subpage) -- 10 means Template:
+	local opp = args['mu'] or "Zetterburn"
 	
 	local box = mw.html.create("div"):addClass("mu-box")
 	

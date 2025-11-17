@@ -1,6 +1,6 @@
-import { Mwbot } from "mwbot-ts";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { mw } from "./utils";
 
 const mw = await Mwbot.init({
   apiUrl: "https://dragdown.wiki/w/api.php",

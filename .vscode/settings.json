@@ -2,5 +2,8 @@
   "Lua.diagnostics.globals": ["mw"],
   "Lua.codeLens.enable": true,
   "Lua.runtime.version": "Lua 5.1",
-  "editor.formatOnSave": false // dont auto format for now
+  "Lua.completion.autoRequire": true,
+  "Lua.completion.requireSeparator": ".",
+  "editor.formatOnSave": false, // dont auto format for now,
+  "editor.rulers": [80]
 }

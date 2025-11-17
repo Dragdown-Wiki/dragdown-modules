@@ -4,6 +4,8 @@ local cargo = mw.ext.cargo
 
 local tabber = require("Tabber").renderTabber
 local tooltip = require("Tooltip")
+local GetImagesWikitext = require("GetImagesWikitext")
+local utils = require("Move Card Utils")
 
 local function readModes(chara, attack)
 	local tables = "AFQM_MoveMode"
@@ -15,22 +17,6 @@ local function readModes(chara, attack)
 	}
 	local results = cargo.query(tables, fields, args)
 	return results
-end
-
-local function getImagesWikitext(t)
-	local wikitextTable = {}
-	for i, data in ipairs(t) do
-		-- MediaWiki image syntax
-		-- @see https://www.mediawiki.org/wiki/Help:Images/en#Rendering_a_single_image
-		local image = string.format("[[File:%s|thumb|center|210x210px]]", data.file)
-		local caption = tostring(
-			mw.html.create("div"):addClass("gallerytext"):css("text-align", "center"):wikitext(data.caption or "")
-		)
-		table.insert(wikitextTable, image)
-		table.insert(wikitextTable, caption)
-	end
-
-	return wikitextTable
 end
 
 local function mysplit(inputstr, sep)
@@ -47,275 +33,6 @@ local function mysplit(inputstr, sep)
 	return t
 end
 
-local function drawFrame(frames, frameType)
-	local output = ""
-	for i = 1, tonumber(frames) do
-		local frameDataHtml = mw.html.create("div")
-		frameDataHtml:addClass("frame-data frame-data-" .. frameType)
-		frameDataHtml:done()
-		output = output .. tostring(frameDataHtml)
-	end
-	return output
-end
-
-local function drawFrameData(s1, s2, s3, s4)
-	currentFrame = 0
-
-	html = mw.html.create("div")
-	html:addClass("frameChart")
-
-	-- Startup of move, substract 1 if startupIsFirstActive
-	local totalStartup = 0
-	local startup = {}
-	if s1 == nil then
-	elseif tonumber(s1) ~= nil then
-		startup[1] = tonumber(s1)
-		totalStartup = startup[1]
-	elseif string.find(s1, "+") and not string.find(s1, "%[") then
-		for _, v in ipairs(mysplit(s1, "+")) do
-			table.insert(startup, v)
-			totalStartup = totalStartup + v
-		end
-	elseif string.find(s1, "+") and string.find(s1, "%[") then
-		-- for _, v in ipairs(mysplit(mysplit(s1, "[+")[2], " ]")) do
-		-- 	table.insert(startup, v)
-		-- 	totalStartup = totalStartup + v
-		-- end
-	end
-
-	-- Active of move
-
-	active = {}
-	first_active_frame = totalStartup + 1
-	counter = 1
-	if s2 and s2 ~= "N/A" then
-		csplit = mysplit(s2, ",")
-		ATL = #csplit
-		for i = 1, ATL do
-			hyphen = #(mysplit(csplit[i], "-"))
-			startFrame = mysplit(csplit[i], "-")[1]
-			endFrame = mysplit(csplit[i], "-")[hyphen]
-			if tonumber(startFrame) > first_active_frame + 1 then
-				active[counter] = -1 * (tonumber(startFrame) - first_active_frame - 1)
-				counter = counter + 1
-			end
-			active[counter] = endFrame - startFrame + 1
-			counter = counter + 1
-			first_active_frame = tonumber(endFrame)
-		end
-	end
-
-	local totalEndlag = 0
-	local endlag = {}
-	processedEndlag = s3
-	if processedEndlag ~= nil then
-		if string.sub(processedEndlag, -3) == "..." then
-			processedEndlag = string.sub(processedEndlag, 1, -4)
-		end
-		if tonumber(processedEndlag) ~= nil then
-			endlag[1] = processedEndlag
-			totalEndlag = tonumber(endlag[1])
-		elseif string.find(processedEndlag, "+") then
-			for i = 1, #(mysplit(processedEndlag, "+")) do
-				endlag[i] = mysplit(processedEndlag, "+")[i]
-				-- if ('...')
-				totalEndlag = totalEndlag + endlag[i]
-			end
-		end
-	end
-	-- Special Recovery of move
-	local landingLag = s4
-	if tonumber(landingLag) == nil then
-		landingLag = 0
-	end
-
-	-- if active ~= nil then
-	-- 	html:tag('div'):addClass('frameChart-FAF'):wikitext(active[1]):done()
-	-- end
-
-	-- Create container for frame data
-	frameChartDataHtml = mw.html.create("div")
-	frameChartDataHtml:addClass("frameChart-data")
-
-	alt = false
-	for i = 1, #startup do
-		if not alt then
-			frameChartDataHtml:wikitext(drawFrame(startup[i], "startup"))
-		else
-			frameChartDataHtml:wikitext(drawFrame(startup[i], "startup-alt"))
-		end
-		alt = not alt
-	end
-
-	-- Option for inputting multihits, works for moves with 1+ gaps in the active frames
-	alt = false
-	for i = 1, #active do
-		if active[i] < 0 then
-			frameChartDataHtml:wikitext(drawFrame(active[i] * -1, "inactive"))
-			alt = false
-		elseif not alt then
-			frameChartDataHtml:wikitext(drawFrame(active[i], "active"))
-			alt = not alt
-		else
-			frameChartDataHtml:wikitext(drawFrame(active[i], "active-alt"))
-			alt = not alt
-		end
-	end
-	alt = false
-	for i = 1, #endlag do
-		if not alt then
-			frameChartDataHtml:wikitext(drawFrame(endlag[i], "endlag"))
-		else
-			frameChartDataHtml:wikitext(drawFrame(endlag[i], "endlag-alt"))
-		end
-		alt = not alt
-	end
-	frameChartDataHtml:wikitext(drawFrame(landingLag, "landingLag"))
-
-	local fdtotal = mw.html.create("div"):addClass("frame-data-total")
-	fdtotal:node(mw.html.create("span"):addClass("frame-data-total-label"):wikitext("First Active Frame:"))
-
-	if s2 ~= nil then
-		fdtotal:node(mw.html.create("span"):addClass("frame-data-total-value"):wikitext(totalStartup + 1))
-	else
-		fdtotal:node(mw.html.create("span"):addClass("frame-data-total-value"):wikitext("N/A"))
-	end
-	fdtotal:done()
-	html:node(frameChartDataHtml)
-	html:node(fdtotal):done()
-
-	return tostring(html)
-		.. mw.getCurrentFrame():extensionTag({
-			name = "templatestyles",
-			args = { src = "Module:FrameChart/styles.css" },
-		})
-end
-
-local function calcShieldSafety(result, mode, active, custom)
-	if
-		mode.attackID == "Bthrow"
-		or mode.attackID == "Uthrow"
-		or mode.attackID == "Dthrow"
-		or mode.attackID == "Fthrow"
-		or mode.attackID == "Grab"
-		or mode.attackID == "Pummel"
-	then
-		return "N/A"
-	end
-
-	if custom == "N/A" then
-		return "N/A"
-	end
-	if mode.endlag == "..." then
-		return "N/A"
-	end
-	if custom ~= nil and custom ~= "JAB" and custom ~= "-" then
-		return custom
-	end
-	
-	if tonumber(mode.totalDuration) then
-		local stun = result.BlockStun
-		
-		local active1 = mysplit(active, ", ")
-		active1 = active1[#active1]
-		local active2 = mysplit(active1, "-")
-		local first = mode.totalDuration - active2[1]
-		local second = mode.totalDuration - active2[#active2]
-		if mode.iasa then
-			first = mode.iasa - active2[1]
-			second = mode.iasa - active2[#active2]
-		end
-
-		if mode.landingLag ~= nil then
-			local realLandingLag = mode.landingLag
-
-			return string.format("%+d", stun - realLandingLag)
-
-		else
-			if first == second then
-				return string.format("%+d", stun - first)
-			else
-				return string.format("%+d to %+d", stun - first, stun - second)
-			end
-		end
-	else
-		return "N/A"
-	end
-end
-
-local function makeAngleDisplay(angle)
-	angle = tonumber(angle)
-	local angleColor = mw.html.create("span"):wikitext(angle)
-	if angle > 360 then
-		angleColor:css("color", "#ff0000")
-	elseif angle <= 45 or angle >= 315 then
-		angleColor:css("color", "#1ba6ff")
-	elseif angle > 225 then
-		angleColor:css("color", "#ff6b6b")
-	elseif angle > 135 then
-		angleColor:css("color", "#de7cd1")
-	elseif angle > 45 then
-		angleColor:css("color", "#16df53")
-	end
-
-	local display = mw.html.create("span")
-	local div1 = mw.html.create("div"):css("position", "relative"):css("top", "0"):css("max-width", "256px")
-
-	if angle < 360 then
-		div1:tag("div")
-			:css("transform", "rotate(-" .. angle .. "deg)")
-			:css("z-index", "0")
-			:css("position", "absolute")
-			:css("top", "0")
-			:css("left", "0")
-			:css("transform-origin", "center center")
-			:wikitext("[[File:AFQM_AngleComplex_BG.svg|256px|link=]]")
-			:done()
-			:tag("div")
-			:css("z-index", "1")
-			:css("position", "relative")
-			:css("top", "0")
-			:css("left", "0")
-			:wikitext("[[File:AFQM_AngleComplex_MG.svg|256px|link=]]")
-			:done()
-			:tag("div")
-			:css("transform", "rotate(-" .. angle .. "deg)")
-			:css("z-index", "2")
-			:css("position", "absolute")
-			:css("top", "0")
-			:css("left", "0")
-			:css("transform-origin", "center center")
-			:wikitext("[[File:AFQM_AngleComplex_FG.svg|256px|link=]]")
-			:done()
-		div1:done()
-		display:node(div1):wikitext("[[File:AFQM_AngleComplex_Key.svg|256px|link=]]")
-		display:done()
-	else
-		div1:done()
-		display:node(div1)
-		display:done()
-	end
-	return tostring(tooltip(tostring(angleColor), tostring(display)))
-end
-
-local function showHitUniques(hasArticle, result, unique)
-	local listOfUniques = {}
-
-	if unique ~= nil then
-		local uniquesList = mysplit(unique, "\\")
-		for k, v in pairs(uniquesList) do
-			table.insert(listOfUniques, v)
-		end
-	end
-	
-	if #listOfUniques <= 0 then
-		return nil
-	else
-		return table.concat(listOfUniques, ", ")
-	end
-	return
-end
-
 local function getHits(hasArticle, result, mode, hitData)
 	--chara, attackID, hitID, hitMoveID, hitName, hitActive,  uniques
 	local hitRow = mw.html.create("tr"):addClass("hit-row")
@@ -325,27 +42,10 @@ local function getHits(hasArticle, result, mode, hitData)
 		:tag("td"):wikitext(result.bkb )
 		:tag("td"):wikitext(result.kbs )
 		:tag("td"):wikitext(result.hitlag )
-		:tag("td"):wikitext(makeAngleDisplay(result.angle))
+		:tag("td"):wikitext(utils.makeAngleDisplay(result.angle))
 		:done()
 	return hitRow
 end
-
--- local function getAdvHits(result, mode, hitData, articleData)
--- 	--chara, attackID, hitID, hitMoveID, hitName, hitActive,  uniques
-
--- 	local columns = ""
-
--- 	local hitRow = mw.html.create("tr")
--- 	for k, v in ipairs(mysplit(columns, ",")) do
--- 		local assignedValue = ""
--- 		assignedValue = result[v]
--- 		local cell = mw.html.create("td"):wikitext(assignedValue):done()
--- 		hitRow:node(cell)
--- 	end
-
--- 	hitRow:done()
--- 	return hitRow
--- end
 
 local function createMode(hasArticle, mode, motherhits, hitresults, throwresults)
 	-- Frame Window
@@ -569,7 +269,7 @@ local function createMode(hasArticle, mode, motherhits, hitresults, throwresults
 			frameChart:wikitext(mode.frameChart):done()
 		end
 	else
-		frameChart:wikitext(drawFrameData(mode.startup,mode.totalActive,mode.endlag,mode.landingLag)):done()
+		frameChart:wikitext(utils.drawFrameData(mode.startup,mode.totalActive,mode.endlag,mode.landingLag)):done()
 	end
 
 	local numbersPanel = mw.html.create("div"):addClass("numbers-panel"):css("overflow-x","auto"):node(t):node(frameChart)
@@ -613,7 +313,7 @@ local function createMode(hasArticle, mode, motherhits, hitresults, throwresults
 						motherhits[k]
 					)
 				)
-				local uniqueRow = showHitUniques(hasArticle, hitresults[k], motherhits[k].unique)
+				local uniqueRow = utils.showHitUniques(hasArticle, hitresults[k], motherhits[k].unique)
 				if uniqueRow then
 					hitsWindow:tag("tr"):addClass("unique-row"):tag("td"):attr("colspan", 8):css("text-align", "left"):wikitext("'''Unique''': " .. uniqueRow):done()
 				end
@@ -658,7 +358,7 @@ local function createAdvMode(mode, articleList, motherhits, hitresults, throwres
 		local hitsWindow = mw.html.create("table"):addClass("hits-window wikitable"):node(headersRow)
 
 		for k, v in ipairs(hitresults) do
-			hitsWindow:node(getAdvHits(hitresults[k], mode, motherhits[hitresults[k]], articleList))
+			hitsWindow:node(p.getAdvHits(hitresults[k], mode, motherhits[hitresults[k]], articleList))
 			-- tumbleTable:node(calcFullTumble(hitresults[k], false, false, motherhits[hitresults[k].moveID .. hitresults[k].nameID].name))
 			-- CCTable:node(calcFullTumble(hitresults[k], true, false, motherhits[hitresults[k].moveID .. hitresults[k].nameID].name))
 		end
@@ -673,41 +373,7 @@ local function createAdvMode(mode, articleList, motherhits, hitresults, throwres
 	return tostring(finalreturn)
 end
 
-local function getImageGallery(chara, attack)
-	local tables = "AFQM_MoveMode, AFQM_MoveMode__image, AFQM_MoveMode__caption"
-	local fields = "image, caption"
-	local args = {
-		join = "AFQM_MoveMode__image._rowID=AFQM_MoveMode._ID, AFQM_MoveMode__image._rowID=AFQM_MoveMode__caption._rowID, AFQM_MoveMode__image._position=AFQM_MoveMode__caption._position",
-		where = 'AFQM_MoveMode.chara="' .. chara .. '" and AFQM_MoveMode.attack="' .. attack .. '"',
-		orderBy = "_ID",
-		groupBy = "AFQM_MoveMode__image._value",
-	}
-	local results = cargo.query(tables, fields, args)
 
-	local imageCaptionPairs = {}
-
-	for k, v in pairs(results) do
-		local imageList = mysplit(results[k]["image"], "\\")
-		local captionList = mysplit(results[k]["caption"], "\\")
-		if imageList ~= nil then
-			for k, v in pairs(imageList) do
-				if captionList == nil then
-					table.insert(imageCaptionPairs, { file = imageList[k], caption = "" })
-				else
-					table.insert(imageCaptionPairs, { file = imageList[k], caption = captionList[k] })
-				end
-			end
-		end
-	end
-	local container = mw.html.create("div"):addClass("attack-gallery-image")
-	container:wikitext(table.concat(getImagesWikitext(imageCaptionPairs)))
-
-	return tostring(container)
-end
-
-local function getHitboxGallery(chara, attack)
-	return "Hitboxes are currently unavailable."
-end
 
 local function getCardHTML(chara, attack, desc, advDesc)
 	-- Lazy Load automated frame chart generator
@@ -716,12 +382,12 @@ local function getCardHTML(chara, attack, desc, advDesc)
 	local card = mw.html.create("div"):addClass("attack-container")
 
 	-- Images
-	local acquiredImages = getImageGallery(chara, attack)
+	local acquiredImages = utils.getImageGallery(chara, attack)
 	local tabberData
 	if acquiredImages ~= '<div class="attack-gallery-image"></div>' then
 		tabberData = tabber({
 			label1 = "Images",
-			content1 = getImageGallery(chara, attack),
+			content1 = utils.getImageGallery(chara, attack),
 			-- label2 = "Hitboxes",
 			-- content2 = getHitboxGallery(chara, attack),
 		})
@@ -729,7 +395,7 @@ local function getCardHTML(chara, attack, desc, advDesc)
 		local container = mw.html.create("div"):addClass("attack-gallery-image")
 		container:wikitext(
 			table.concat(
-				getImagesWikitext({
+				utils.getImagesWikitext({
 					{
 						file = "AFQM_" .. chara .. "_" .. attack .. "_0.png",
 						caption = "NOTE: This is an incomplete card, with data modes planning to be uploaded in the future.",

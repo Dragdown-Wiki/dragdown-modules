@@ -1,9 +1,10 @@
 local mysplit = require "mysplit"
 local drawFrameData = require "Move Card drawFrameData"
 local showHitUniques= require "Move Card showHitUniques"
+local tooltip = require "Tooltip"
 
 --- @param getHits function takes hasArticle,result,mode,hitData returns mw html element (table i guess)
---- @param config table config.iasa, config.autocancel, config.hitHeaders
+--- @param config { iasa: boolean, autocancel: boolean, hitHeaders: table }
 local function createMode(
     hasArticle, mode, motherhits, hitresults, throwresults,
     getHits,

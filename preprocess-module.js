@@ -19,8 +19,16 @@ export const preprocessModule = (luaString) => {
       ) {
         return match;
       }
+
       // Preserve the original quote type
       const quote = match.includes('"') ? '"' : "'";
+
+      if (requiredModuleName.startsWith("pl.")) {
+        const penlightSubmodule = requiredModuleName.slice("pl.".length)
+        const firstUpper = penlightSubmodule[0].toUpperCase() + penlightSubmodule.slice(1)
+        return `require(${quote}Module:Penlight_${firstUpper}${quote})`
+      }
+
       return `require(${quote}Module:${requiredModuleName}${quote})`;
     }
   );

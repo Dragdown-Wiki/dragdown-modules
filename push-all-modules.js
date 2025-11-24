@@ -1,16 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { mw } from "./utils.js";
-import { preprocessModule } from "./preprocess-module.js";
 import PQueue from "p-queue";
+import { updateModule } from "./utils.js";
 
-const mw = await Mwbot.init({
-  apiUrl: "https://dragdown.wiki/w/api.php",
-  credentials: {
-    username: process.env.DRAGDOWN_USERNAME,
-    password: process.env.DRAGDOWN_PASSWORD,
-  },
-});
+/**
+ * TODO
+ * consider porting this and all other JS code to Lua
+ */
 
 const moduleFilesOnDiskWithModifiedNaming = await fs.readdir("./modules");
 // const modulePagesOnDragdown = await mw.prefixSearch("Module:");
@@ -32,29 +28,7 @@ const queue = new PQueue({ concurrency: 5 });
 for (let i = 0; i < moduleFilesOnDiskWithModifiedNaming.length; i++) {
   queue.add(async () => {
     const page = moduleFilesOnDiskWithOriginalNaming[i];
-
-    const { content: currentContentOnDragdown } = await mw.read(page);
-
-    const currentUnpreprocessedContentOnDisk = await fs.readFile(
-      `./modules/${moduleFilesOnDiskWithModifiedNaming[i]}`,
-      "utf-8"
-    );
-
-    const currentPreprocessedContentOnDisk = preprocessModule(
-      currentUnpreprocessedContentOnDisk
-    );
-
-    if (
-      currentContentOnDragdown.trim() !==
-      currentPreprocessedContentOnDisk.trim()
-    ) {
-      console.log("Updating", page);
-      await mw.edit(page, () => ({
-        text: currentPreprocessedContentOnDisk,
-        bot: true,
-        summary: "Auto-update from GitHub",
-      }));
-    }
+    await updateModule(page)
   });
 }
 

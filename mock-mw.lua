@@ -1,7 +1,12 @@
-local luassert = require("luassert")
-local cargo  = require("cargo")
+local luassert  = require("luassert")
+local cargo     = require("cargo2")
+local inspect = require("inspect").inspect
 
-local node_mt = {}
+-- this is probably sufficient for mocking dragdown modules,
+-- but if needed, mw source code is here:
+-- https://github.com/wikimedia/mediawiki-extensions-Scribunto/blob/master/includes/Engines/LuaCommon/lualib
+
+local node_mt   = {}
 node_mt.__index = node_mt
 
 function node_mt:addClass(cls)
@@ -37,15 +42,45 @@ function node_mt:attr(name, value)
 end
 
 function node_mt:node(node)
-  luassert.same(getmetatable(node), getmetatable(self))
+  assert(
+    type(node) == "string"
+    or getmetatable(node) == getmetatable(self)
+  )
 
-  node._parent = self
+  if type(node) ~= "string" then
+    node._parent = self
+  end
+
   table.insert(self._nodes, node)
   return self
 end
 
+function node_mt:tag(tag)
+  luassert.is_string(tag)
+
+  local node = setmetatable({
+    _tag = tag,
+    _css = "",
+    _attr = {},
+    _nodes = {},
+    _parent = self
+  }, node_mt)
+
+  self:node(node)
+
+  return node
+end
+
 function node_mt:wikitext(wikitext)
-  luassert.is_string(wikitext)
+  if wikitext == nil then
+    return self
+  end
+
+  local t = type(wikitext)
+
+  if t ~= "number" and t ~= "string" then
+    error("assert failed. got type: " .. t)
+  end
 
   table.insert(self._nodes, wikitext)
   return self
@@ -125,28 +160,59 @@ _G.mw = {
   },
   getCurrentFrame = function()
     return {
+      preprocess = function(self, str)
+        return str
+      end,
       extensionTag = function(self, tbl)
-        return "<extensionTag todo: mock>"
-        -- local result = "{{"
+        if tbl and tbl.name == "tabber" then
+          return [[
+<div class="tabber tabber--live">
+  <header class="tabber__header">
+    <button
+      class="tabber__header__prev"
+      tabindex="-1"
+      type="button"
+      aria-hidden="true"
+    ></button>
+    <nav class="tabber__tabs" role="tablist">
+      <a
+        class="tabber__tab"
+        role="tab"
+        id="tabber-Images-label"
+        href="#tabber-Images"
+        aria-controls="tabber-Images"
+        tabindex="0"
+        aria-selected="true"
+        >Images</a
+      >
+    </nav>
+    <button
+      class="tabber__header__next"
+      tabindex="-1"
+      type="button"
+      aria-hidden="true"
+    ></button>
+  </header>
+  <section class="tabber__section" style="height: 514px">
+    <article
+      class="tabber__panel"
+      role="tabpanel"
+      tabindex="0"
+      id="tabber-Images"
+      aria-labelledby="tabber-Images-label"
+    >
+]] .. tbl.content .. [[
+    </article>
+  </section>
+</div>
+          ]]
+        end
 
-        -- local firstIsTbl = type(tbl) == "table"
+        if tbl and tbl.name == "templatestyles" then
+          return "<templatestyles src='".. tbl.args.src .."'/>"
+        end
 
-        -- if firstIsTbl then
-        --   result = result
-        -- else
-        --   result = result .. tbl
-        -- end
-
-        -- if tbl.args and tbl.args.src then
-        --   result = result .. "|"..tbl.args.src
-        -- end
-
-        -- if tbl.content then
-        --   result = result .. "|" .. tbl.content
-        -- end
-
-        -- result = result .. "}}"
-        -- return result
+        error("cant handle this extensionTag call: " .. inspect(tbl))
       end
     }
   end,

@@ -1,14 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { mw } from "./utils";
-
-const mw = await Mwbot.init({
-  apiUrl: "https://dragdown.wiki/w/api.php",
-  credentials: {
-    username: process.env.DRAGDOWN_USERNAME,
-    password: process.env.DRAGDOWN_PASSWORD,
-  },
-});
+import { mw } from "./utils.js";
 
 const modulePages = await mw.prefixSearch("Module:");
 

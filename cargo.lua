@@ -1,3 +1,6 @@
+-- currently unused "old" cargo forwarder that uses Special:CargoExport
+-- instead of api.php?action=cargoquery.
+
 local http_request = require "http.request"
 local http_util = require "http.util"
 local cjson = require "cjson"

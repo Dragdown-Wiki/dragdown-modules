@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import PQueue from "p-queue";
-import { updateModule } from "./utils.js";
+import { updateModule } from "../framework/utils.js";
 
 /**
  * TODO

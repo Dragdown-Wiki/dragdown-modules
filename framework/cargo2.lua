@@ -5,9 +5,9 @@ local http_request = require "http.request"
 local http_util = require "http.util"
 local cjson = require "cjson"
 local types = require "tableshape".types
-local cookie = require "mw-get-cookie"
+local cookie = require "framework.mw-get-cookie"
 local inspect = require "inspect".inspect
-local simpleHash = require "simplehash"
+local simpleHash = require "framework.simplehash"
 
 local argsTableShape = types.shape {
   where = types.string:is_optional(),
@@ -53,6 +53,8 @@ local function cargo(tables, fields, argsTable)
   if err == nil then
     return res
   end
+
+  print("Cargo cache miss, querying tables " .. tables)
 
   local query = http_request.new_from_uri(
     "https://dragdown.wiki/w/api.php?" .. paramsString

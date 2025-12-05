@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { mw } from "./utils.js";
+import { mw } from "../framework/utils.js";
 
 const modulePages = await mw.prefixSearch("Module:");
 

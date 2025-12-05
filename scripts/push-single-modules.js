@@ -1,4 +1,4 @@
-import { updateModule } from "./utils.js";
+import { updateModule } from "../framework/utils.js";
 
 /**
  * TODO

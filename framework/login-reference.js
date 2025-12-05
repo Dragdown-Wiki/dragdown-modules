@@ -1,3 +1,5 @@
+// just some dependency-less JS mediawiki login code for reference
+
 const token = await fetch(
   "https://dragdown.wiki/w/api.php?action=query&format=json&meta=tokens&type=*"
 );
@@ -6,8 +8,8 @@ const tokenJson = await token.json();
 
 const loginWithFetch = await fetch("https://dragdown.wiki/w/api.php", {
   method: "POST",
-  body: `action=login&lgname=Waffeln&lgpassword=${encodeURIComponent(
-    "f%17ntfY@d5#t5yJFKhOzp8n"
+  body: `action=login&lgname=User&lgpassword=${encodeURIComponent(
+    "Password"
   )}&lgtoken=${encodeURIComponent(tokenJson.query.tokens.logintoken)}`,
   headers: {
     Cookie: token.headers.get("set-cookie"),

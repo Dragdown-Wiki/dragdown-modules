@@ -2,6 +2,9 @@
 local http_request = require "http.request"
 local http_util = require "http.util"
 local cjson = require "cjson"
+local dotenv = require("lua-dotenv")
+
+dotenv.load_dotenv(".env")
 
 local res, err = table.load(".cache/cookie")
 
@@ -22,8 +25,8 @@ login.headers:upsert("cookie", headers:get("set-cookie"))
 
 login:set_body(http_util.dict_to_query({
   action = "login",
-  lgname = "Waffeln",
-  lgpassword = "f%17ntfY@d5#t5yJFKhOzp8n",
+  lgname = dotenv.get("DRAGDOWN_USERNAME"),
+  lgpassword = dotenv.get("DRAGDOWN_PASSWORD"),
   lgtoken = cjson.decode(token_stream:get_body_as_string()).query.tokens.logintoken,
 }))
 

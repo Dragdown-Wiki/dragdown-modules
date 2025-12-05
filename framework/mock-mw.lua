@@ -1,10 +1,13 @@
 local luassert  = require("luassert")
-local cargo     = require("cargo2")
+local cargo     = require("framework.cargo2")
 local inspect = require("inspect").inspect
 
 -- this is probably sufficient for mocking dragdown modules,
 -- but if needed, mw source code is here:
 -- https://github.com/wikimedia/mediawiki-extensions-Scribunto/blob/master/includes/Engines/LuaCommon/lualib
+
+-- mw API reference
+-- https://www.mediawiki.org/wiki/Extension:Scribunto/Lua_reference_manual
 
 local node_mt   = {}
 node_mt.__index = node_mt
@@ -35,7 +38,7 @@ end
 
 function node_mt:attr(name, value)
   luassert.is.string(name)
-  luassert.is.string(value)
+  assert(type(value) == "string" or type(value) == "number")
 
   self._attr[name] = value
   return self
@@ -136,6 +139,8 @@ function node_mt:__tostring()
   return r
 end
 
+local titleTable = nil
+
 _G.mw = {
   html = {
     create = function(tag)
@@ -151,11 +156,11 @@ _G.mw = {
     end
   },
   title = {
+    setCurrentTitle = function(newTitleTable)
+      titleTable = newTitleTable
+    end,
     getCurrentTitle = function()
-      return {
-        rootText = "AFQM",
-        subpageText = "Rend"
-      }
+      return titleTable
     end
   },
   getCurrentFrame = function()
@@ -225,5 +230,15 @@ _G.mw = {
     find = function(str, pattern, init, plain)
       return string.find(str, pattern, init, plain)
     end
-  }
+  },
+  log = function(...)
+    local args = { ... }
+    local stringified = ""
+
+    for _, v in ipairs(args) do
+      stringified = stringified .. tostring(v)
+    end
+
+    print(stringified)
+  end
 }

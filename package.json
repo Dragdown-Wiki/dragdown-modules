@@ -1,8 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "pull-modules": "node --env-file .env pull-modules.js",
-    "push-modules": "node --env-file .env push-modules.js"
+    "pull-modules": "node --env-file .env scripts/pull-modules.js",
+    "push-modules": "node --env-file .env scripts/push-modules.js"
   },
   "packageManager": "pnpm@10.20.0",
   "devDependencies": {

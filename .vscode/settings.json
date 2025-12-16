@@ -16,8 +16,9 @@
   "Lua.workspace.library": [
     "/config/.luarocks/share/lua/5.1/",
     "${addons}/luassert/module/library",
-    "${addons}/penlight/module/library",
-    "${3rd}/lfs/library"
+    "${3rd}/lfs/library",
+    "${addons}/penlight/module/library"
   ],
-  "Lua.workspace.checkThirdParty": false
+  "Lua.workspace.checkThirdParty": false,
+  "search.useIgnoreFiles": false
 }

@@ -1,22 +1,28 @@
-package.path  = "./?.lua;"
-              .. "/config/.luarocks/share/lua/5.1/?.lua;"
-              .. "/config/.luarocks/share/lua/5.1/?/init.lua;"
-              .. "./modules/?.lua;"
-              .. package.path
+package.path = os.getenv("HOME") .. "/.luarocks/share/lua/5.1/?.lua;"
+    .. os.getenv("HOME") .. "/.luarocks/share/lua/5.1/?/init.lua;"
+    .. "./modules/?.lua;"
+    .. package.path
 
-package.cpath = "/config/.luarocks/lib/lua/5.1/?.so;"
-              .. package.cpath
+package.cpath = os.getenv("HOME") .. "/.luarocks/lib/lua/5.1/?.so;"
+    .. package.cpath
+
+-- what i needed for code-server:
+-- package.path  = "./?.lua;"
+--               .. "/config/.luarocks/share/lua/5.1/?.lua;"
+--               .. "/config/.luarocks/share/lua/5.1/?/init.lua;"
+--               .. "./modules/?.lua;"
+--               .. package.path
 
 require "framework.save-table-to-file"
 require "framework.mock-mw"
-local inspect = require "inspect".inspect
 local tblx = require("pl.tablex")
-local List = require("pl.List")
 
 local games = {
   "AFQM",
   "PPlus"
 }
+
+os.execute("mkdir -p reference_output")
 
 return function(callback)
   for _, game in ipairs(games) do
@@ -52,35 +58,33 @@ return function(callback)
       end
     end)
 
-    local count = 0
-
-    for i, v in ipairs(allAttacks) do
+    for _, config in ipairs(allAttacks) do
       -- print(i .. "/" .. #allAttacks)
-      
-      local success, htmlOrError = xpcall(function()
+
+      local _, htmlOrError = xpcall(function()
         mw.title.setCurrentTitle({
           rootText = game,
-          subpageText = v.chara
+          subpageText = config.chara
         })
 
         return moveCard.main({
           args = {
-            chara = v.chara,
-            attack = v.attack,
+            chara = config.chara,
+            attack = config.attack,
             desc = "descPlaceholder",
             advDesc = "advDescPlaceholder"
           },
           getParent = function() end
         })
       end, function(err)
-        print("=> failed at " .. game .. " - " .. v.chara .. " - " .. v.attack)
+        print("=> failed at " .. game .. " - " .. config.chara .. " - " .. config.attack)
         print(err)
         print(debug.traceback())
         os.exit(1)
       end)
-      
-      local filePath = "reference_output/" .. game .. "_" .. v.chara .. "_" .. v.attack .. ".html"
-      callback(htmlOrError, filePath)
+
+      local filePath = "reference_output/" .. game .. "_" .. config.chara .. "_" .. config.attack .. ".html"
+      callback(htmlOrError, filePath, config)
     end
   end
 end

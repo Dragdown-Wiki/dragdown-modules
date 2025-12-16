@@ -17,6 +17,8 @@ local argsTableShape = types.shape {
   orderBy = types.string:is_optional()
 }
 
+os.execute("mkdir -p .cache")
+
 --- @param tables string
 --- @param fields string
 --- @param argsTable {

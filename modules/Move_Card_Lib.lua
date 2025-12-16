@@ -123,29 +123,9 @@ local function getTabberData(chara, attack)
   })
 end
 
-local function getActive(totalActive, totalStartup)
-  local active = List()
-  local first_active_frame = totalStartup + 1
-
-  for _, value in ipairs(List.split(totalActive or "", ",")) do
-    local list = List.split(value, "-"):map(tonumber)
-    local startFrame = list[1]
-
-    if startFrame > first_active_frame + 1 then
-      active:append(-1 * (startFrame - first_active_frame - 1))
-    end
-
-    local endFrame = list:pop()
-    active:append(endFrame - startFrame + 1)
-    first_active_frame = endFrame
-  end
-
-  return active
-end
-
 local function getModes(chara, attack, fields)
   return mw.ext.cargo.query(
-    getGame().. "_MoveMode",
+    getGame() .. "_MoveMode",
     fields,
     {
       where = 'chara="' .. chara .. '" and attack="' .. attack .. '"',
@@ -154,25 +134,96 @@ local function getModes(chara, attack, fields)
   )
 end
 
+local function multiSplitLast(text, separators)
+  local list = List({ text })
+
+  for _, sep in ipairs(separators) do
+    list = List.split(list:pop(), sep)
+  end
+
+  return list:pop()
+end
+
+local function multiSplitFirst(text, separators)
+  local list = List({ text })
+
+  for _, sep in ipairs(separators) do
+    list = List.split(list[1], sep)
+  end
+
+  return list[1]
+end
+
+--- @param text string?
+local function parseThing(text)
+  if text == nil then
+    return List({})
+  end
+
+  if tonumber(text) ~= nil then
+    return List({ tonumber(text) })
+  end
+
+  if text:find("+") and not string.find(text, "%[") then
+    return List.split(text, "+")
+  end
+
+  return List({})
+end
+
+--- @param mode { startup: string }
+local function getTotalStartup(mode)
+  return List(parseThing(mode.startup)):reduce("+") or 0
+end
+
+--- @param mode { totalActive: string?, startup: string }
+local function getActive(mode)
+  local totalStartup = getTotalStartup(mode)
+  local active = List()
+  local firstActive = totalStartup + 1
+
+  if not mode.totalActive or mode.totalActive == "N/A" then
+    return {}
+  end
+
+  for _, v in ipairs(List.split(mode.totalActive, ",")) do
+    local splitted = List.split(v, "-"):map(tonumber)
+    local start = splitted[1]
+
+    if start > firstActive + 1 then
+      active:append(-1 * (start - firstActive - 1))
+    end
+
+    local last = splitted:pop()
+    active:append(last - start + 1)
+    firstActive = last
+  end
+
+  return active
+end
+
+--- @param mode { startup: string, endlag: integer, landingLag: string, totalActive: string? }
 local function drawFrameData(mode)
   -- Create container for frame data
   local frameChartDataHtml = mw.html.create("div"):addClass("frameChart-data")
-  local startup = tonumber(mode.startup) and List({ mode.startup }) or List.split(mode.startup or "", "+")
 
-  for k, v in ipairs(startup) do
+  for k, v in ipairs(parseThing(mode.startup)) do
     local isEven = k % 2 == 0
-    frameChartDataHtml:wikitext(drawFrame(v, "startup" .. (isEven and "-alt" or "")))
+    frameChartDataHtml:wikitext(
+      drawFrame(v, "startup" .. (isEven and "-alt" or ""))
+    )
   end
 
-  local totalStartup = startup:reduce("+") or 0
-
   -- Option for inputting multihits, works for moves with 1+ gaps in the active frames
+  local alt = false
 
-  for _, v in pairs(getActive(mode.totalActive, totalStartup)) do
+  for _, v in ipairs(getActive(mode)) do
     if v < 0 then
       frameChartDataHtml:wikitext(drawFrame(v * -1, "inactive"))
+      alt = false
     else
-      frameChartDataHtml:wikitext(drawFrame(v, "active"))
+      frameChartDataHtml:wikitext(drawFrame(v, "active" .. (alt and "-alt" or "")))
+      alt = not alt
     end
   end
 
@@ -197,7 +248,7 @@ local function drawFrameData(mode)
       :tag("span")
       :addClass("frame-data-total-value")
       :wikitext(
-        mode.totalActive == nil and "N/A" or totalStartup + 1
+        mode.totalActive == nil and "N/A" or getTotalStartup(mode) + 1
       )
 
   return tostring(html)
@@ -207,23 +258,15 @@ local function drawFrameData(mode)
       })
 end
 
-local function parseThing(text)
-  if tonumber(text) ~= nil then
-    return { tonumber(text) }
-  end
-
-  if text:find("+") then
-    return List.split(text, "+")
-  end
-
-  return nil
-end
-
 return {
   drawFrame = drawFrame,
   makeAngleDisplay = makeAngleDisplay,
   getTabberData = getTabberData,
   drawFrameData = drawFrameData,
   parseThing = parseThing,
-  getModes = getModes
+  getModes = getModes,
+  getActive = getActive,
+  getTotalStartup = getTotalStartup,
+  multiSplitLast = multiSplitLast,
+  multiSplitFirst = multiSplitFirst,
 }

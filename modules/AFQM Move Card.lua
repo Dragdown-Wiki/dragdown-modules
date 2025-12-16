@@ -1,5 +1,6 @@
 local tooltip = require("Tooltip")
 local mysplit = require("Mysplit")
+local lib = require("Move_Card_Lib")
 local List = require("pl.List")
 
 local hitHeaders = List({
@@ -24,10 +25,6 @@ local hitHeaders = List({
 	tooltip("Angle", "The angle at which the move sends the target."),
 })
 
-local lib = require("Move_Card_Lib")
-
-local drawFrameData = lib.drawFrameData
-
 local function getDataRow(landingLag, columnValues)
 	local dataRow = mw.html.create("tr"):addClass("frame-window-data")
 	local columnValuesTags = List({ "startup", "totalActive", "endlag" })
@@ -44,8 +41,6 @@ local function getDataRow(landingLag, columnValues)
 
 	return dataRow
 end
-
-local makeAngleDisplay = lib.makeAngleDisplay
 
 local function getHeadersRow(mode)
 	local columnHeaders = List({
@@ -79,7 +74,7 @@ local function getNumbersPanel(tableElem, mode)
 			:css("overflow-x", "auto")
 			:node(tableElem)
 			:tag("div"):addClass("frame-chart")
-			:wikitext(drawFrameData(mode))
+			:wikitext(lib.drawFrameData(mode))
 			:done()
 
 	if mode.hitID == nil then
@@ -115,7 +110,7 @@ local function getNumbersPanel(tableElem, mode)
 				:tag("td"):wikitext(result.bkb)
 				:tag("td"):wikitext(result.kbs)
 				:tag("td"):wikitext(result.hitlag)
-				:tag("td"):wikitext(makeAngleDisplay(result.angle))
+				:tag("td"):wikitext(lib.makeAngleDisplay(result.angle))
 	end
 
 	return numbersPanel
@@ -192,8 +187,6 @@ local function createMode(mode)
 	return tostring(getNumbersPanel(tableElem, mode))
 end
 
-local getTabberData = lib.getTabberData
-
 return {
 	main = function(frame)
 		local args = require("Arguments").getArgs(frame)
@@ -239,7 +232,7 @@ return {
 
 		card:tag("div")
 				:addClass("attack-gallery")
-				:wikitext(getTabberData(chara, args.attack))
+				:wikitext(lib.getTabberData(chara, args.attack))
 
 		local attackInfo = card:tag("div"):addClass("attack-info"):node(paletteSwap)
 

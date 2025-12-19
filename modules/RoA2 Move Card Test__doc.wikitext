@@ -1,5 +1,0 @@
-This is for testing before pushing to the live cards.
-
-{{#invoke:RoA2 Move Card Test|main|chara=FakeZetterburn|attack=Utilt}}
-{{#invoke:RoA2 Move Card Test|main|chara=Zetterburn|attack=Utilt}}
-{{#invoke:RoA2 Move Card Test|main|chara=Clairen|attack=Dtilt}}

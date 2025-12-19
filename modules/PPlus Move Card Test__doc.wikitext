@@ -1,2 +1,0 @@
-{{#invoke:PPlus Move Card Test|main|chara = Mewtwo|attack = Dthrow}}
-{{#invoke:PPlus Move Card Test|main|chara = Mario|attack = Uthrow}}

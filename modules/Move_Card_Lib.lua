@@ -2,6 +2,8 @@ local List = require("pl.List")
 local tooltip = require("Tooltip")
 local GetImagesWikitext = require("GetImagesWikitext")
 
+--- @param frames number
+--- @param frameType string
 local function drawFrame(frames, frameType)
   return List.range(1, tonumber(frames))
       :map(function()
@@ -124,14 +126,14 @@ local function getTabberData(chara, attack)
 end
 
 local function getModes(chara, attack, fields)
-  return mw.ext.cargo.query(
+  return List(mw.ext.cargo.query(
     getGame() .. "_MoveMode",
     fields,
     {
       where = 'chara="' .. chara .. '" and attack="' .. attack .. '"',
       orderBy = "_ID"
     }
-  )
+  ))
 end
 
 local function multiSplitLast(text, separators)
@@ -142,6 +144,24 @@ local function multiSplitLast(text, separators)
   end
 
   return list:pop()
+end
+
+local function computeEndlag(mode)
+  if mode.endlag and mode.endlag ~= "..." then
+    return mode.endlag
+  end
+
+  if not mode.totalActive or not tonumber(mode.totalDuration) then
+    return 0
+  end
+
+  local lastActive = multiSplitLast(mode.totalActive, { ",", "-" })
+
+  if mode.iasa then
+    return mode.iasa - 1 - lastActive
+  end
+
+  return mode.totalDuration - lastActive
 end
 
 local function multiSplitFirst(text, separators)
@@ -171,9 +191,18 @@ local function parseThing(text)
   return List({})
 end
 
+local function getStartup(mode)
+  if mode.startup == nil and mode.totalActive ~= nil then
+    return multiSplitFirst(mode.totalActive, { ",", "-" }) - 1
+  end
+
+  return mode.startup
+end
+
 --- @param mode { startup: string }
 local function getTotalStartup(mode)
-  return List(parseThing(mode.startup)):reduce("+") or 0
+  local startup = getStartup(mode)
+  return List(parseThing(startup)):reduce("+") or 0
 end
 
 --- @param mode { totalActive: string?, startup: string }
@@ -202,12 +231,19 @@ local function getActive(mode)
   return active
 end
 
---- @param mode { startup: string, endlag: integer, landingLag: string, totalActive: string? }
+--- @param mode { startup: string, endlag: string?, landingLag: string, totalActive: string?, totalDuration: string? }
 local function drawFrameData(mode)
+  -- Trust numeric endlag if provided; otherwise use the shared computation.
+  local endlag = tonumber(mode.endlag)
+  if not endlag then
+    endlag = computeEndlag(mode)
+  end
+
   -- Create container for frame data
   local frameChartDataHtml = mw.html.create("div"):addClass("frameChart-data")
 
-  for k, v in ipairs(parseThing(mode.startup)) do
+
+  for k, v in ipairs(parseThing(getStartup(mode))) do
     local isEven = k % 2 == 0
     frameChartDataHtml:wikitext(
       drawFrame(v, "startup" .. (isEven and "-alt" or ""))
@@ -227,10 +263,11 @@ local function drawFrameData(mode)
     end
   end
 
-  frameChartDataHtml:wikitext(drawFrame(mode.endlag, "endlag"))
+  frameChartDataHtml:wikitext(drawFrame(endlag, "endlag"))
 
   -- Special Recovery of move
   local landingLag = tonumber(mode.landingLag) or 0
+  -- landingLag = computeEndlag(mode)
 
   frameChartDataHtml:wikitext(drawFrame(landingLag, "landingLag"))
 
@@ -258,6 +295,88 @@ local function drawFrameData(mode)
       })
 end
 
+local function tabber(keyValuePairs)
+  return mw.getCurrentFrame():extensionTag({
+    name = "tabber",
+    content = List(keyValuePairs):map(function(keyValuePair)
+      return "|-|" .. keyValuePair[1] .. "=" .. keyValuePair[2]
+    end):join()
+  })
+end
+
+local function startupAppendix(note)
+  if not note or note == "" then
+    return ""
+  end
+
+  if note == "SMASH" then
+    return " " .. tooltip("ⓘ", "Total Uncharged Startup<br>[Pre-Charge Window + Post-Charge Window]")
+  elseif note == "RAPIDJAB" then
+    return " " .. tooltip("ⓘ", "[+Rapid Jab Initial Startup] Rapid Jab Loop Startup")
+  end
+
+  return " " .. tooltip("ⓘ", note)
+end
+
+local function computeTotalDuration(mode)
+  if mode.totalDuration then
+    return mode.totalDuration
+  end
+
+  if not mode.totalActive or not mode.endlag then
+    return nil
+  end
+
+  local lastActive = multiSplitLast(mode.totalActive, { ",", "-", "..." })
+
+  -- Sum endlag segments only if all parts are numeric; otherwise, bail out.
+  local sum = 0
+  for _, part in ipairs(List.split(tostring(mode.endlag), "+")) do
+    local n = tonumber(part)
+    if not n then
+      return nil
+    end
+    sum = sum + n
+  end
+
+  return lastActive + sum
+end
+
+local function getFrameChart(mode)
+  local frameChart = mw.html.create("div"):addClass("frame-chart")
+
+  if (mode.frameChart ~= nil) then
+    if (mode.frameChart == 'N/A') then
+      frameChart:wikitext("''This frame chart is currently unavailable and will be added at a later time.''")
+    else
+      frameChart:wikitext(mode.frameChart)
+    end
+  else
+    frameChart:wikitext(drawFrameData({
+      endlag = computeEndlag(mode),
+      landingLag = mode.landingLag,
+      startup = mode.startup,
+      totalActive = mode.totalActive,
+    }))
+  end
+
+  return frameChart
+end
+
+local function notesRow(text)
+  if not text or text == "" then
+    return nil
+  end
+
+  return mw.html
+      .create("tr")
+      :addClass("notes-row")
+      :tag("td")
+      :css("text-align", "left")
+      :attr("colspan", "100%")
+      :wikitext("'''Notes:''' " .. text)
+end
+
 return {
   drawFrame = drawFrame,
   makeAngleDisplay = makeAngleDisplay,
@@ -269,4 +388,11 @@ return {
   getTotalStartup = getTotalStartup,
   multiSplitLast = multiSplitLast,
   multiSplitFirst = multiSplitFirst,
+  tabber = tabber,
+  startupAppendix = startupAppendix,
+  computeEndlag = computeEndlag,
+  computeTotalDuration = computeTotalDuration,
+  getFrameChart = getFrameChart,
+  notesRow = notesRow,
+  getStartup = getStartup,
 }

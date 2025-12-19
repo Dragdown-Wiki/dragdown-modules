@@ -1,24 +1,27 @@
 {
-  "Lua.diagnostics.globals": ["mw"],
-  "Lua.codeLens.enable": true,
-  "Lua.runtime.version": "Lua 5.1",
-  "Lua.completion.autoRequire": true,
-  "Lua.completion.requireSeparator": ".",
-  "editor.formatOnSave": false, // dont auto format for now,
-  "editor.rulers": [80],
-  "lua.debug.settings.luaVersion": "lua51",
-  "Lua.hint.paramName": "Literal",
-  "Lua.type.checkTableShape": true,
-  "Lua.workspace.ignoreDir": [
-    ".vscode",
-    "node_modules"
-  ],
-  "Lua.workspace.library": [
-    "/config/.luarocks/share/lua/5.1/",
-    "${addons}/luassert/module/library",
-    "${3rd}/lfs/library",
-    "${addons}/penlight/module/library"
-  ],
-  "Lua.workspace.checkThirdParty": false,
-  "search.useIgnoreFiles": false
+	"Lua.diagnostics.globals": ["mw"],
+	"Lua.codeLens.enable": true,
+	"Lua.runtime.version": "Lua 5.1",
+	"Lua.completion.autoRequire": true,
+	"Lua.completion.requireSeparator": ".",
+	"editor.formatOnSave": false, // dont auto format for now,
+	"lua.debug.settings.luaVersion": "lua51",
+	"Lua.hint.paramName": "Literal",
+	"Lua.type.checkTableShape": true,
+	"Lua.workspace.ignoreDir": [".vscode", "node_modules"],
+	"Lua.workspace.library": [
+		"/config/.luarocks/share/lua/5.1/",
+		"${addons}/luassert/module/library",
+		"${3rd}/lfs/library",
+		"${addons}/penlight/module/library",
+		"${addons}/busted/module/library",
+		"${3rd}/luassert/library"
+	],
+	"Lua.workspace.checkThirdParty": false,
+	"search.useIgnoreFiles": false,
+	"Lua.diagnostics.disable": ["trailing-space"],
+	"Lua.diagnostics.neededFileStatus": {
+		"codestyle-check": "Any"
+	},
+	"editor.detectIndentation": false,
 }

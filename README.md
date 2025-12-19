@@ -15,6 +15,15 @@ to-dos and things to consider:
 - https://lunarmodules.github.io/busted/
 - https://www.mediawiki.org/wiki/Extension:Scribunto/Lua_reference_manual#strict
 
+## run locally installed luarocks
+(currently not needed but maybe you want to)
+add the luarocks bin folder to your path
+```bash
+echo 'export PATH="$HOME/.luarocks/bin:$PATH"' >> ~/.bashrc
+```
+re-open shell or `source ~/.bashrc` and you should be able to run e.g. `busted` (if installed) just as if it was installed without `--local`.
+current testing script doesn't need to be called with busted.
+
 ## general workflow
 
 0. depending on your setup, you may need to edit package.path/package.cpath, see `framework/reference-lib.lua`

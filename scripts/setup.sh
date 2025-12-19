@@ -10,3 +10,4 @@ luarocks install --local lua-cjson
 luarocks install --local tableshape
 luarocks install --local penlight
 luarocks install --local lua-dotenv
+luarocks install --local busted

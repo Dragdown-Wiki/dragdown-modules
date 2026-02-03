@@ -21,7 +21,25 @@
 	"search.useIgnoreFiles": false,
 	"Lua.diagnostics.disable": ["trailing-space"],
 	"Lua.diagnostics.neededFileStatus": {
-		"codestyle-check": "Any"
+		"codestyle-check": "Any",
+		"no-unknown": "Any",
+		"global-element": "Any",
+		"incomplete-signature-doc": "Any",
+		"missing-global-doc": "Any",
+		"missing-local-export-doc": "Any",
+		"name-style-check": "Any"
 	},
-	"editor.detectIndentation": false,
+	"Lua.nameStyle.config": {
+		"local_name_style": "camel_case",
+		"function_param_name_style": "camel_case",
+		"function_name_style": "camel_case",
+		"local_function_name_style": "camel_case",
+		"table_field_name_style": "camel_case",
+		"global_variable_name_style": "camel_case",
+		"module_name_style": "camel_case",
+		"require_module_name_style": ["camel_case", "pascal_case"],
+		"class_name_style": "camel_case",
+		"const_variable_name_style": "camel_case"
+	},
+	"editor.detectIndentation": false
 }

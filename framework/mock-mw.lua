@@ -1,5 +1,5 @@
-local luassert  = require("luassert")
-local cargo     = require("framework.cargo2")
+local luassert = require("luassert")
+local cargo = require("framework.cargo2")
 local inspect = require("inspect").inspect
 
 -- this is probably sufficient for mocking dragdown modules,
@@ -9,168 +9,173 @@ local inspect = require("inspect").inspect
 -- mw API reference
 -- https://www.mediawiki.org/wiki/Extension:Scribunto/Lua_reference_manual
 
-local node_mt   = {}
+local node_mt = {}
 node_mt.__index = node_mt
 
 function node_mt:addClass(cls)
-  luassert.is.string(cls)
+	luassert.is.string(cls)
 
-  self._class = cls
-  return self
+	self._class = cls
+	return self
 end
 
 function node_mt:css(nameOrTable, maybeValue)
-  if type(nameOrTable) == "string" then
-    luassert.is_string(maybeValue)
+	if type(nameOrTable) == "string" then
+		luassert.is_string(maybeValue)
 
-    self._css = nameOrTable .. ": " .. maybeValue .. "; "
-  else
-    luassert.is_table(nameOrTable)
-    luassert.is_nil(maybeValue)
+		self._css = nameOrTable .. ": " .. maybeValue .. "; "
+	else
+		luassert.is_table(nameOrTable)
+		luassert.is_nil(maybeValue)
 
-    for k, v in pairs(nameOrTable) do
-      self._css = k .. ": " .. v .. "; "
-    end
-  end
+		for k, v in pairs(nameOrTable) do
+			self._css = k .. ": " .. v .. "; "
+		end
+	end
 
-  return self
+	return self
 end
 
 function node_mt:attr(name, value)
-  luassert.is.string(name)
-  assert(type(value) == "string" or type(value) == "number")
+	luassert.is.string(name)
+	assert(type(value) == "string" or type(value) == "number")
 
-  self._attr[name] = value
-  return self
+	self._attr[name] = value
+	return self
 end
 
 function node_mt:node(node)
-  assert(
-    type(node) == "string"
-    or getmetatable(node) == getmetatable(self)
-  )
+	assert(
+		type(node) == "string"
+		or getmetatable(node) == getmetatable(self)
+	)
 
-  if type(node) ~= "string" then
-    node._parent = self
-  end
+	if type(node) ~= "string" then
+		node._parent = self
+	end
 
-  table.insert(self._nodes, node)
-  return self
+	table.insert(self._nodes, node)
+	return self
 end
 
 function node_mt:tag(tag)
-  luassert.is_string(tag)
+	luassert.is_string(tag)
 
-  local node = setmetatable({
-    _tag = tag,
-    _css = "",
-    _attr = {},
-    _nodes = {},
-    _parent = self
-  }, node_mt)
+	local node = setmetatable({
+		_tag = tag,
+		_css = "",
+		_attr = {},
+		_nodes = {},
+		_parent = self,
+	}, node_mt)
 
-  self:node(node)
+	self:node(node)
 
-  return node
+	return node
 end
 
 function node_mt:wikitext(wikitext)
-  if wikitext == nil then
-    return self
-  end
+	if wikitext == nil then
+		return self
+	end
 
-  local t = type(wikitext)
+	local t = type(wikitext)
 
-  if t ~= "number" and t ~= "string" then
-    error("assert failed. got type: " .. t)
-  end
+	if t ~= "number" and t ~= "string" then
+		error("assert failed. got type: " .. t)
+	end
 
-  table.insert(self._nodes, wikitext)
-  return self
+	table.insert(self._nodes, wikitext)
+	return self
 end
 
 function node_mt:allDone()
-  local parent = self._parent
+	local parent = self._parent
 
-  while parent ~= nil do
-    parent = parent._parent
-  end
+	while parent ~= nil do
+		parent = parent._parent
+	end
 
-  return parent or self
+	return parent or self
 end
 
 function node_mt:done()
-  return self._parent or self
+	return self._parent or self
 end
 
 function node_mt:__tostring()
-  local r = "<" .. self._tag
+	local r = "<" .. self._tag
 
-  if self._class then
-    r = r .. " class=\"" .. self._class .. "\""
-  end
+	if self._class then
+		r = r .. " class=\"" .. self._class .. "\""
+	end
 
-  if self._css ~= "" then
-    r = r .. " style=\""
+	if self._css ~= "" then
+		r = r .. " style=\""
 
-    if type(self._css) == "string" then
-      r = r .. self._css
-    else
-      for k, v in pairs(self._css) do
-        r = r .. k .. ": " .. v .. "; "
-      end
-    end
+		if type(self._css) == "string" then
+			r = r .. self._css
+		else
+			for k, v in pairs(self._css) do
+				r = r .. k .. ": " .. v .. "; "
+			end
+		end
 
-    r = r .. "\""
-  end
+		r = r .. "\""
+	end
 
-  for k, v in pairs(self._attr) do
-    r = r .. " " .. k .. "=\"" .. v .. "\""
-  end
+	for k, v in pairs(self._attr) do
+		r = r .. " " .. k .. "=\"" .. v .. "\""
+	end
 
-  r = r .. ">"
+	r = r .. ">"
 
-  for k, v in pairs(self._nodes) do
-    r = r .. "\n  " .. tostring(v)
-  end
+	for k, v in pairs(self._nodes) do
+		r = r .. "\n  " .. tostring(v)
+	end
 
-  r = r .. "</" .. self._tag .. ">"
+	r = r .. "</" .. self._tag .. ">"
 
-  return r
+	return r
 end
 
 local titleTable = nil
 
 _G.mw = {
-  html = {
-    create = function(tag)
-      luassert.is.string(tag)
+	html = {
+		create = function(tag)
+			luassert.is.string(tag)
 
-      return setmetatable({
-        _tag = tag,
-        _css = "",
-        _attr = {},
-        _nodes = {},
-        _parent = nil
-      }, node_mt)
-    end
-  },
-  title = {
-    setCurrentTitle = function(newTitleTable)
-      titleTable = newTitleTable
-    end,
-    getCurrentTitle = function()
-      return titleTable
-    end
-  },
-  getCurrentFrame = function()
-    return {
-      preprocess = function(self, str)
-        return str
-      end,
-      extensionTag = function(self, tbl)
-        if tbl and tbl.name == "tabber" then
-          return [[
+			return setmetatable({
+				_tag = tag,
+				_css = "",
+				_attr = {},
+				_nodes = {},
+				_parent = nil,
+			}, node_mt)
+		end,
+	},
+	title = {
+		setCurrentTitle = function(newTitleTable)
+			titleTable = newTitleTable
+		end,
+		--- @return { rootText: string, subpageText: string }
+		getCurrentTitle = function()
+			if titleTable == nil then
+				error("getCurrentTitle called but title isnt set")
+			end
+
+			return titleTable
+		end,
+	},
+	getCurrentFrame = function()
+		return {
+			preprocess = function(self, str)
+				return str
+			end,
+			extensionTag = function(self, tbl)
+				if tbl and tbl.name == "tabber" then
+					return [[
 <div class="tabber tabber--live">
   <header class="tabber__header">
     <button
@@ -211,34 +216,32 @@ _G.mw = {
   </section>
 </div>
           ]]
-        end
+				end
 
-        if tbl and tbl.name == "templatestyles" then
-          return "<templatestyles src='".. tbl.args.src .."'/>"
-        end
+				if tbl and tbl.name == "templatestyles" then
+					return "<templatestyles src='" .. tbl.args.src .. "'/>"
+				end
 
-        error("cant handle this extensionTag call: " .. inspect(tbl))
-      end
-    }
-  end,
-  ext = {
-    cargo = {
-      query = cargo
-    }
-  },
-  ustring = {
-    find = function(str, pattern, init, plain)
-      return string.find(str, pattern, init, plain)
-    end
-  },
-  log = function(...)
-    local args = { ... }
-    local stringified = ""
+				error("cant handle this extensionTag call: " .. inspect(tbl))
+			end,
+		}
+	end,
+	ext = { cargo = {
+		query = cargo,
+	}, },
+	ustring = {
+		find = function(str, pattern, init, plain)
+			return string.find(str, pattern, init, plain)
+		end,
+	},
+	log = function(...)
+		local args = { ... }
+		local stringified = ""
 
-    for _, v in ipairs(args) do
-      stringified = stringified .. tostring(v)
-    end
+		for _, v in ipairs(args) do
+			stringified = stringified .. tostring(v)
+		end
 
-    print(stringified)
-  end
+		print(stringified)
+	end,
 }
